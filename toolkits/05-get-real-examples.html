@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Real Using Examples · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+    --given:#2f6d6a; --when:#c47f2a; --then:#7a4fb0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:27px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:20px;letter-spacing:.04em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:600px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:14px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;}
+  textarea,input[type=text],select{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus,select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+  select{cursor:pointer;}
+
+  /* BDD clause rows */
+  .clause{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+  .kw{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;min-width:74px;text-align:center;padding:9px 6px;border-radius:8px;flex-shrink:0;}
+  .kw.given{background:var(--given);}
+  .kw.when{background:var(--when);}
+  .kw.then{background:var(--then);}
+  .kw.and{background:#9aa4b0;}
+  .clause input{flex:1;}
+  .rmBtn{background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:8px 6px;}
+  .addAnd{background:transparent;border:1px dashed var(--line);border-radius:8px;padding:5px 10px;font-size:11.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;margin:2px 0 12px 82px;}
+  .blockLabel{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9aa4b0;font-weight:700;margin:4px 0 6px 2px;}
+
+  /* Gherkin preview */
+  .gherkin{background:var(--ink);color:#e8e2d6;border-radius:12px;padding:16px 18px;margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-x:auto;}
+  .gherkin .g-feature{color:#fff;font-weight:700;}
+  .gherkin .g-scenario{color:#f0e2cb;}
+  .gherkin .g-given{color:#7fd1cb;}
+  .gherkin .g-when{color:#e6a860;}
+  .gherkin .g-then{color:#c3a3e6;}
+  .gherkin .g-and{color:#9aa4b0;}
+  .copyBtn{background:transparent;border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;margin-top:10px;}
+
+  /* Use case */
+  .uc2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.uc2{grid-template-columns:1fr;}}
+  .flowWrap{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff;position:relative;}
+  .flowNum{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--teal);width:22px;height:22px;display:inline-grid;place-items:center;border-radius:6px;margin-right:8px;}
+  .altWrap{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fffdf8;position:relative;}
+  .altNum{background:var(--amber);}
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+  .rmCorner{position:absolute;top:8px;right:8px;background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;}
+  .stepText{display:flex;gap:8px;align-items:flex-start;}
+  .stepText input{flex:1;}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.addAnd,.repeatBtn,.rmBtn,.rmCorner,.copyBtn,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    .gherkin{background:#f5f5f5;color:#000;}
+    .gherkin span{color:#000 !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #4</div>
+      <h1><span class="mono">Get Real Using Examples</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  GET REAL USING EXAMPLES — BDD generator + Use Case canvas
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="bdd", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// BDD state
+const bdd={
+  feature:"", scenario:"",
+  given:[""], when:[""], then:[""]
+};
+// Use case state
+const uc={
+  name:"", type:"system",
+  actors:"", usage:"", goal:"",
+  happy:[""], alt:[{title:"",steps:[""]}]
+};
+
+const TABS=[
+  {id:"bdd", code:"BD", enT:"BDD Scenario", frT:"Scénario BDD"},
+  {id:"usecase", code:"UC", enT:"Use Case", frT:"Cas d'utilisation"},
+];
+
+const MEMO={
+  bdd:{
+    en:["Format: Given (context) · When (event) · Then (outcome). Add 'And' lines for extra context/actions/outcomes.",
+        "Write examples BEFORE development — they double as acceptance criteria and test scenarios.",
+        "One feature usually needs several scenarios (happy path, exceptions) to define its business rules."],
+    fr:["Format : Étant donné (contexte) · Quand (événement) · Alors (résultat). Ajoutez des lignes « Et » pour contexte/actions/résultats supplémentaires.",
+        "Écrivez les exemples AVANT le développement — ils servent de critères d'acceptation ET de scénarios de test.",
+        "Une fonctionnalité demande souvent plusieurs scénarios (chemin heureux, exceptions) pour définir ses règles métier."]},
+  usecase:{
+    en:["Two types: Business use case (actor ↔ process/function) and System use case (actor ↔ system/app).",
+        "Focus on the actor's WANTS, not the product's capabilities. Filter needs from wants.",
+        "Always document the happy path, then alternate flows (misuse, exceptions) to surface exception handling."],
+    fr:["Deux types : cas métier (acteur ↔ processus/fonction) et cas système (acteur ↔ système/application).",
+        "Centrez sur les DÉSIRS de l'acteur, pas les capacités du produit. Distinguez besoins et désirs.",
+        "Documentez toujours le chemin heureux, puis les flux alternatifs (mauvais usage, exceptions)."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Two tools for the fourth BA principle — turn requirements into concrete, testable examples.",
+    "Deux outils pour le quatrième principe — transformer les exigences en exemples concrets et testables.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Get Real Using Examples” insight (Principle #4). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Get Real Using Examples » de l'IIBA (principe #4). Aide à la pratique — non testé à l'examen.");
+}
+
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+// ───────── BDD ─────────
+function clauseRows(block, kw, kwClass){
+  const arr=bdd[block];
+  return arr.map((val,i)=>{
+    const label=i===0?kw:T("And","Et");
+    const cls=i===0?kwClass:"and";
+    return `<div class="clause">
+      <span class="kw ${cls}">${label}</span>
+      <input type="text" data-bdd="${block}" data-i="${i}" value="${esc(val)}" placeholder="${bddPlaceholder(block,i)}">
+      ${arr.length>1?`<button class="rmBtn" data-bddrm="${block}" data-i="${i}">×</button>`:""}
+    </div>`;
+  }).join("")
+  + `<button class="addAnd" data-bddadd="${block}">+ ${T("And","Et")}…</button>`;
+}
+function bddPlaceholder(block,i){
+  const map={
+    given:[T("a context (I'm overdrawn)","un contexte (je suis à découvert)"),T("further context","contexte additionnel")],
+    when:[T("an action / event (I request $20)","une action / événement (je demande 20 $)"),T("further action","action additionnelle")],
+    then:[T("an outcome (I receive no money)","un résultat (je ne reçois rien)"),T("further outcome","résultat additionnel")]
+  };
+  return esc(map[block][i>0?1:0]);
+}
+
+function renderBdd(){
+  const p=el("panel");
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("BDD Scenario Builder","Générateur de scénario BDD")}</h2>
+      <p class="panelIntro">${T("Describe behaviour as a concrete example. It doubles as acceptance criteria and a test.","Décrivez le comportement comme un exemple concret. Il sert de critère d'acceptation et de test.")}</p>
+    </div>
+    ${memoUI("bdd")}
+    <div class="fieldWrap"><span class="fieldLabel">${T("Feature","Fonctionnalité")}</span><input type="text" data-bddmeta="feature" value="${esc(bdd.feature)}" placeholder="${T("e.g. ATM money withdrawal","ex. Retrait d'argent au guichet")}"></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Scenario","Scénario")}</span><input type="text" data-bddmeta="scenario" value="${esc(bdd.scenario)}" placeholder="${T("e.g. Account has insufficient funds","ex. Compte avec fonds insuffisants")}"></div>
+    <div class="blockLabel">${T("Context","Contexte")}</div>
+    ${clauseRows("given",T("Given","Étant donné"),"given")}
+    <div class="blockLabel">${T("Event","Événement")}</div>
+    ${clauseRows("when",T("When","Quand"),"when")}
+    <div class="blockLabel">${T("Outcome","Résultat")}</div>
+    ${clauseRows("then",T("Then","Alors"),"then")}
+    <div class="gherkin" id="gherkin"></div>
+    <button class="copyBtn" id="copyBtn">${T("Copy Gherkin","Copier le Gherkin")}</button>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-bddmeta]").forEach(inp=>inp.addEventListener("input",e=>{bdd[e.target.dataset.bddmeta]=e.target.value;renderGherkin();}));
+  p.querySelectorAll("[data-bdd]").forEach(inp=>inp.addEventListener("input",e=>{
+    bdd[e.target.dataset.bdd][+e.target.dataset.i]=e.target.value;renderGherkin();
+  }));
+  p.querySelectorAll("[data-bddadd]").forEach(b=>b.onclick=()=>{bdd[b.dataset.bddadd].push("");renderBdd();});
+  p.querySelectorAll("[data-bddrm]").forEach(b=>b.onclick=()=>{bdd[b.dataset.bddrm].splice(+b.dataset.i,1);renderBdd();});
+  el("copyBtn").onclick=()=>{
+    const txt=gherkinText();
+    navigator.clipboard?.writeText(txt).then(()=>{el("copyBtn").textContent=T("Copied ✓","Copié ✓");setTimeout(()=>el("copyBtn").textContent=T("Copy Gherkin","Copier le Gherkin"),1500);});
+  };
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{bdd.feature=bdd.scenario="";bdd.given=[""];bdd.when=[""];bdd.then=[""];renderBdd();};
+  renderGherkin();
+}
+function gherkinText(){
+  const L=[];
+  L.push(`${T("Feature","Fonctionnalité")}: ${bdd.feature||"<"+T("name","nom")+">"}`);
+  L.push(`  ${T("Scenario","Scénario")}: ${bdd.scenario||"<"+T("situation","situation")+">"}`);
+  const block=(arr,kw)=>arr.forEach((v,i)=>{L.push(`    ${i===0?kw:T("And","Et")} ${v||"…"}`);});
+  block(bdd.given,T("Given","Étant donné"));
+  block(bdd.when,T("When","Quand"));
+  block(bdd.then,T("Then","Alors"));
+  return L.join("\n");
+}
+function renderGherkin(){
+  const box=el("gherkin"); if(!box)return;
+  const line=(kw,v,cls,i)=>`<span class="g-${cls}">    ${i===0?kw:T("And","Et")}</span> ${esc(v||"…")}`;
+  let html=`<span class="g-feature">${T("Feature","Fonctionnalité")}: ${esc(bdd.feature||"<"+T("name","nom")+">")}</span>\n`;
+  html+=`<span class="g-scenario">  ${T("Scenario","Scénario")}: ${esc(bdd.scenario||"<"+T("situation","situation")+">")}</span>\n`;
+  bdd.given.forEach((v,i)=>html+=line(T("Given","Étant donné"),v,"given",i)+"\n");
+  bdd.when.forEach((v,i)=>html+=line(T("When","Quand"),v,"when",i)+"\n");
+  bdd.then.forEach((v,i)=>html+=line(T("Then","Alors"),v,"then",i)+"\n");
+  box.innerHTML=html;
+}
+
+// ───────── USE CASE ─────────
+function renderUseCase(){
+  const p=el("panel");
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Use Case Canvas","Canevas de cas d'utilisation")}</h2>
+      <p class="panelIntro">${T("Capture actors, goals, the happy path, and alternate flows for a system or business process.","Saisissez les acteurs, objectifs, le chemin heureux et les flux alternatifs d'un système ou processus.")}</p>
+    </div>
+    ${memoUI("usecase")}
+    <div class="uc2">
+      <div class="fieldWrap"><span class="fieldLabel">${T("Use case name","Nom du cas d'utilisation")}</span><input type="text" data-uc="name" value="${esc(uc.name)}" placeholder="${T("e.g. Withdraw cash","ex. Retirer de l'argent")}"></div>
+      <div class="fieldWrap"><span class="fieldLabel">${T("Type","Type")}</span>
+        <select data-uc="type">
+          <option value="system" ${uc.type==="system"?"selected":""}>${T("System (actor ↔ system/app)","Système (acteur ↔ système/app)")}</option>
+          <option value="business" ${uc.type==="business"?"selected":""}>${T("Business (actor ↔ process)","Métier (acteur ↔ processus)")}</option>
+        </select>
+      </div>
+    </div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Actors","Acteurs")} <span class="fieldHint">${T("customers, users, external forces","clients, usagers, forces externes")}</span></span><input type="text" data-uc="actors" value="${esc(uc.actors)}" placeholder="${T("e.g. Account holder, Bank system","ex. Titulaire du compte, Système bancaire")}"></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Usage — why & how they engage","Usage — pourquoi & comment ils interagissent")}</span><textarea rows="2" data-uc="usage" placeholder="${T("Why and how the actors use it","Pourquoi et comment les acteurs l'utilisent")}">${esc(uc.usage)}</textarea></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Actor goal (their want)","Objectif de l'acteur (son désir)")}</span><input type="text" data-uc="goal" value="${esc(uc.goal)}" placeholder="${T("Focus on the want, not the product","Le désir, pas le produit")}"></div>
+
+    <div class="blockLabel">😊 ${T("Happy path (successful scenario)","Chemin heureux (scénario réussi)")}</div>
+    <div id="happyList"></div>
+    <button class="repeatBtn" id="addHappy">+ ${T("Add step","Ajouter une étape")}</button>
+
+    <div class="blockLabel" style="margin-top:16px">🔀 ${T("Alternate flows (misuse / exceptions)","Flux alternatifs (mauvais usage / exceptions)")}</div>
+    <div id="altList"></div>
+    <button class="repeatBtn" id="addAlt">+ ${T("Add alternate flow","Ajouter un flux alternatif")}</button>
+
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-uc]").forEach(inp=>{
+    const evt=inp.tagName==="SELECT"?"change":"input";
+    inp.addEventListener(evt,e=>{uc[e.target.dataset.uc]=e.target.value;});
+  });
+  renderHappy(); renderAlt();
+  el("addHappy").onclick=()=>{uc.happy.push("");renderHappy();};
+  el("addAlt").onclick=()=>{uc.alt.push({title:"",steps:[""]});renderAlt();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{uc.name=uc.actors=uc.usage=uc.goal="";uc.type="system";uc.happy=[""];uc.alt=[{title:"",steps:[""]}];renderUseCase();};
+}
+function renderHappy(){
+  const c=el("happyList"); c.innerHTML="";
+  uc.happy.forEach((s,i)=>{
+    const d=document.createElement("div"); d.className="stepText"; d.style.marginBottom="8px";
+    d.innerHTML=`<span class="flowNum">${i+1}</span><input type="text" data-happy="${i}" value="${esc(s)}" placeholder="${T("Step description","Description de l'étape")}">${uc.happy.length>1?`<button class="rmBtn" data-happyrm="${i}">×</button>`:""}`;
+    c.appendChild(d);
+  });
+  c.querySelectorAll("[data-happy]").forEach(inp=>inp.addEventListener("input",e=>{uc.happy[+e.target.dataset.happy]=e.target.value;}));
+  c.querySelectorAll("[data-happyrm]").forEach(b=>b.onclick=()=>{uc.happy.splice(+b.dataset.happyrm,1);renderHappy();});
+}
+function renderAlt(){
+  const c=el("altList"); c.innerHTML="";
+  uc.alt.forEach((flow,fi)=>{
+    const w=document.createElement("div"); w.className="altWrap";
+    let stepsHtml="";
+    flow.steps.forEach((s,si)=>{
+      stepsHtml+=`<div class="stepText" style="margin-bottom:7px"><span class="flowNum altNum">${fi+1}.${si+1}</span><input type="text" data-altstep="${fi}" data-si="${si}" value="${esc(s)}" placeholder="${T("Step description","Description de l'étape")}">${flow.steps.length>1?`<button class="rmBtn" data-altsteprm="${fi}" data-si="${si}">×</button>`:""}</div>`;
+    });
+    w.innerHTML=`${uc.alt.length>1?`<button class="rmCorner" data-altrm="${fi}">×</button>`:""}
+      <input type="text" data-alttitle="${fi}" value="${esc(flow.title)}" placeholder="${T("Alternate flow name (e.g. Insufficient funds)","Nom du flux (ex. Fonds insuffisants)")}" style="margin-bottom:10px;font-weight:600">
+      ${stepsHtml}
+      <button class="repeatBtn" data-addaltstep="${fi}" style="margin-top:4px">+ ${T("Step","Étape")}</button>`;
+    c.appendChild(w);
+  });
+  c.querySelectorAll("[data-alttitle]").forEach(inp=>inp.addEventListener("input",e=>{uc.alt[+e.target.dataset.alttitle].title=e.target.value;}));
+  c.querySelectorAll("[data-altstep]").forEach(inp=>inp.addEventListener("input",e=>{uc.alt[+e.target.dataset.altstep].steps[+e.target.dataset.si]=e.target.value;}));
+  c.querySelectorAll("[data-addaltstep]").forEach(b=>b.onclick=()=>{uc.alt[+b.dataset.addaltstep].steps.push("");renderAlt();});
+  c.querySelectorAll("[data-altsteprm]").forEach(b=>b.onclick=()=>{uc.alt[+b.dataset.altsteprm].steps.splice(+b.dataset.si,1);renderAlt();});
+  c.querySelectorAll("[data-altrm]").forEach(b=>b.onclick=()=>{uc.alt.splice(+b.dataset.altrm,1);renderAlt();});
+}
+
+function renderPanel(){ activeTab==="bdd"?renderBdd():renderUseCase(); }
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

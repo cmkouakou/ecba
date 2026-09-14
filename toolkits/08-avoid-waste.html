@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avoid Waste · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+    --good:#2e7d55; --bad:#c0392b; --orphan:#fbe9e7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1060px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:27px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:20px;letter-spacing:.04em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:610px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:14px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;}
+  textarea,input[type=text],select{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+
+  /* Traceability table */
+  .tableWrap{overflow-x:auto;margin-bottom:12px;}
+  table{border-collapse:collapse;width:100%;min-width:760px;}
+  th,td{padding:8px 8px;text-align:left;font-size:13px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);font-weight:700;}
+  td input{width:100%;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;}
+  tr.orphan td{background:var(--orphan);}
+  .statusCell{text-align:center;white-space:nowrap;}
+  .badge{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;border-radius:20px;padding:3px 9px;display:inline-block;}
+  .badge.ok{background:#e4f2ea;color:var(--good);}
+  .badge.orphan{background:#fbe1dc;color:var(--bad);}
+  .idCell{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--teal);white-space:nowrap;padding-top:14px;}
+  .rmBtn{background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:8px 6px;}
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+  .orphanAlert{background:#fef4f2;border:1px solid #f3d5cf;border-radius:12px;padding:13px 15px;margin-top:14px;font-size:13.5px;color:var(--bad);display:flex;gap:9px;align-items:flex-start;}
+  .orphanAlert.clean{background:#eef7f1;border-color:#cfe6d8;color:var(--good);}
+  .orphanAlert b{font-weight:700;}
+  .summaryBar{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13px;}
+  .stat b{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--ink);display:block;}
+  .stat.orphanStat b{color:var(--bad);}
+
+  /* Solution Intent */
+  .intentGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:640px){.intentGrid{grid-template-columns:1fr;}}
+  .intentCard{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fff;}
+  .intentHead{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+  .intentEmoji{font-size:19px;}
+  .intentTitle{font-size:15px;font-weight:750;margin:0;}
+  .intentHint{font-size:12px;color:#94836a;margin:0 0 8px;line-height:1.4;}
+  .intentCard textarea{border:1px solid var(--line);background:#fafafa;}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.repeatBtn,.rmBtn,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    tr.orphan td{background:#f5f5f5 !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #7</div>
+      <h1><span class="mono">Avoid Waste</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  AVOID WASTE — Traceability matrix + Solution Intent canvas
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="trace", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Traceability state: each row links a requirement back to an objective and forward to a test
+let trace=[
+  {req:"", objective:"", test:""},
+];
+// Solution intent state
+const intent={ vision:"", context:"", compliance:"", architecture:"", usecases:"", success:"" };
+
+const INTENT_SECTIONS=[
+  {id:"vision", emoji:"🔭", enT:"Vision", frT:"Vision", enH:"Capabilities and features of the initiative, product, or solution.", frH:"Capacités et fonctionnalités de l'initiative, du produit ou de la solution."},
+  {id:"context", emoji:"🌐", enT:"Solution context", frT:"Contexte de la solution", enH:"Where it operates, who uses it, how it's maintained, infrastructure, interoperability.", frH:"Où elle opère, qui l'utilise, comment on la maintient, infrastructure, interopérabilité."},
+  {id:"compliance", emoji:"📋", enT:"Compliance", frT:"Conformité", enH:"Compliance considerations — cite specific regulations.", frH:"Considérations de conformité — citez les régulations spécifiques."},
+  {id:"architecture", emoji:"🏛️", enT:"Architecture", frT:"Architecture", enH:"Critical architectural elements of the solution, if known.", frH:"Éléments architecturaux critiques de la solution, si connus."},
+  {id:"usecases", emoji:"🎬", enT:"Use cases", frT:"Cas d'utilisation", enH:"High-level use cases and trade-offs to vet with stakeholders.", frH:"Cas d'utilisation de haut niveau et arbitrages à valider avec les parties prenantes."},
+  {id:"success", emoji:"🎯", enT:"Success criteria", frT:"Critères de succès", enH:"What success looks like once live + high-level tests that confirm it.", frH:"À quoi ressemble le succès une fois en service + tests de haut niveau qui le confirment."},
+];
+
+const TABS=[
+  {id:"trace", code:"TR", enT:"Traceability Matrix", frT:"Matrice de traçabilité"},
+  {id:"intent", code:"SI", enT:"Solution Intent", frT:"Intention de la solution"},
+];
+
+const MEMO={
+  trace:{
+    en:["The matrix traces each requirement BACK to a business objective/capability and FORWARD to a test case.",
+        "An 'orphan' requirement satisfies no business need — flag it and discard it.",
+        "Maintain it with QA and all stakeholders so changing objectives flow through to implementation."],
+    fr:["La matrice relie chaque exigence EN AMONT à un objectif/capacité métier et EN AVAL à un cas de test.",
+        "Une exigence « orpheline » ne sert aucun besoin métier — signalez-la et éliminez-la.",
+        "Maintenez-la avec la QA et les parties prenantes pour que les objectifs changeants se répercutent."]},
+  intent:{
+    en:["Document intent high-level and simple — avoid over-documenting; capture the overall intent, not every detail.",
+        "Six elements: Vision, Solution context, Compliance, Architecture, Use cases, Success criteria.",
+        "'Quality begins with the intent' (Deming). Intent evolves — document its evolution over time."],
+    fr:["Documentez l'intention de façon simple et haut niveau — ne sur-documentez pas ; l'intention globale, pas chaque détail.",
+        "Six éléments : Vision, Contexte, Conformité, Architecture, Cas d'utilisation, Critères de succès.",
+        "« La qualité commence par l'intention » (Deming). L'intention évolue — documentez son évolution."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Two tools for the seventh BA principle — trace out orphan requirements, and document solution intent.",
+    "Deux outils pour le septième principe — traquer les exigences orphelines, et documenter l'intention de la solution.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Avoid Waste” insight (Principle #7). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Avoid Waste » de l'IIBA (principe #7). Aide à la pratique — non testé à l'examen.");
+}
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+// ───────── TRACEABILITY ─────────
+function isOrphan(r){
+  // orphan = has a requirement text but no objective OR no test linkage
+  return r.req.trim() && (!r.objective.trim() || !r.test.trim());
+}
+function renderTrace(){
+  const p=el("panel");
+  const filled=trace.filter(r=>r.req.trim());
+  const orphans=trace.filter(isOrphan);
+  const linked=filled.length-orphans.length;
+
+  const rows=trace.map((r,i)=>{
+    const orphan=isOrphan(r);
+    return `<tr class="${orphan?"orphan":""}">
+      <td class="idCell">REQ-${String(i+1).padStart(2,"0")}</td>
+      <td><input type="text" data-tr="${i}" data-k="req" value="${esc(r.req)}" placeholder="${T("Requirement","Exigence")}"></td>
+      <td><input type="text" data-tr="${i}" data-k="objective" value="${esc(r.objective)}" placeholder="${T("← Business objective / capability","← Objectif / capacité métier")}"></td>
+      <td><input type="text" data-tr="${i}" data-k="test" value="${esc(r.test)}" placeholder="${T("Test case / scenario →","Cas de test / scénario →")}"></td>
+      <td class="statusCell">${r.req.trim()?(orphan?`<span class="badge orphan">${T("ORPHAN","ORPHELINE")}</span>`:`<span class="badge ok">${T("LINKED","RELIÉE")}</span>`):""}</td>
+      <td>${trace.length>1?`<button class="rmBtn" data-trrm="${i}">×</button>`:""}</td>
+    </tr>`;
+  }).join("");
+
+  const alert = orphans.length
+    ? `<div class="orphanAlert"><span>⚠️</span><span><b>${orphans.length} ${T("orphan requirement(s)","exigence(s) orpheline(s)")}</b> — ${T("each is missing a business objective or a test. Link it, or discard it to avoid waste.","chacune manque d'un objectif métier ou d'un test. Reliez-la, ou éliminez-la pour éviter le gaspillage.")}</span></div>`
+    : (filled.length?`<div class="orphanAlert clean"><span>✅</span><span>${T("No orphans — every requirement traces back to an objective and forward to a test.","Aucune orpheline — chaque exigence remonte à un objectif et descend vers un test.")}</span></div>`:"");
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Traceability Matrix","Matrice de traçabilité")}</h2>
+      <p class="panelIntro">${T("Link each requirement back to an objective and forward to a test. Orphans are flagged automatically.","Reliez chaque exigence à un objectif en amont et à un test en aval. Les orphelines sont signalées automatiquement.")}</p>
+    </div>
+    ${memoUI("trace")}
+    <div class="summaryBar">
+      <div class="stat"><b>${filled.length}</b>${T("requirements","exigences")}</div>
+      <div class="stat"><b>${linked}</b>${T("fully linked","reliées")}</div>
+      <div class="stat orphanStat"><b>${orphans.length}</b>${T("orphans","orphelines")}</div>
+    </div>
+    <div class="tableWrap"><table>
+      <thead><tr>
+        <th>ID</th>
+        <th>${T("Requirement","Exigence")}</th>
+        <th>← ${T("Objective / capability","Objectif / capacité")}</th>
+        <th>${T("Test case / scenario","Cas de test / scénario")} →</th>
+        <th style="text-align:center">${T("Status","Statut")}</th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <button class="repeatBtn" id="addRow">+ ${T("Add requirement","Ajouter une exigence")}</button>
+    ${alert}
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-tr]").forEach(inp=>inp.addEventListener("input",e=>{
+    trace[+e.target.dataset.tr][e.target.dataset.k]=e.target.value;
+    // re-render on blur to refresh status without losing focus mid-typing
+  }));
+  p.querySelectorAll("[data-tr]").forEach(inp=>inp.addEventListener("blur",renderTrace));
+  p.querySelectorAll("[data-trrm]").forEach(b=>b.onclick=()=>{trace.splice(+b.dataset.trrm,1);renderTrace();});
+  el("addRow").onclick=()=>{trace.push({req:"",objective:"",test:""});renderTrace();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{trace=[{req:"",objective:"",test:""}];renderTrace();};
+}
+
+// ───────── SOLUTION INTENT ─────────
+function renderIntent(){
+  const p=el("panel");
+  const cards=INTENT_SECTIONS.map(s=>`
+    <div class="intentCard">
+      <div class="intentHead"><span class="intentEmoji">${s.emoji}</span><p class="intentTitle">${lang==="en"?s.enT:s.frT}</p></div>
+      <p class="intentHint">${esc(lang==="en"?s.enH:s.frH)}</p>
+      <textarea rows="3" data-intent="${s.id}" placeholder="${T("Keep it high-level…","Restez haut niveau…")}">${esc(intent[s.id])}</textarea>
+    </div>`).join("");
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Solution Intent Canvas","Canevas d'intention de la solution")}</h2>
+      <p class="panelIntro">${T("High-level documentation of the solution's requirements, design, and architecture. Simple by design.","Documentation de haut niveau des exigences, du design et de l'architecture. Volontairement simple.")}</p>
+    </div>
+    ${memoUI("intent")}
+    <div class="intentGrid">${cards}</div>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-intent]").forEach(inp=>inp.addEventListener("input",e=>{intent[e.target.dataset.intent]=e.target.value;}));
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{INTENT_SECTIONS.forEach(s=>intent[s.id]="");renderIntent();};
+}
+
+function renderPanel(){ activeTab==="trace"?renderTrace():renderIntent(); }
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

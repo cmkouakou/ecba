@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Understand What Is Doable · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+    --good:#2e7d55; --mid:#c9902b; --bad:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:27px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:20px;letter-spacing:.04em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:600px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:14px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;}
+  textarea,input[type=text],select{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus,select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+  select{cursor:pointer;}
+
+  /* DVFS lenses */
+  .lens{border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px;background:#fff;}
+  .lensHead{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .lensEmoji{font-size:22px;}
+  .lensTitle{font-size:16px;font-weight:750;margin:0;}
+  .lensQ{font-size:13px;color:var(--slate);margin:2px 0 0;}
+  .rating{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+  .rBtn{border:1px solid var(--line);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;font-family:inherit;color:var(--slate);transition:all .14s ease;}
+  .rBtn.sel-yes{background:var(--good);color:#fff;border-color:var(--good);}
+  .rBtn.sel-partial{background:var(--mid);color:#fff;border-color:var(--mid);}
+  .rBtn.sel-no{background:var(--bad);color:#fff;border-color:var(--bad);}
+
+  /* verdict */
+  .verdict{border-radius:14px;padding:18px 20px;margin-top:8px;color:#fff;text-align:center;}
+  .verdict.good{background:var(--good);}
+  .verdict.mid{background:var(--mid);}
+  .verdict.bad{background:var(--bad);}
+  .verdict.none{background:#9aa4b0;}
+  .verdictLabel{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85;margin-bottom:6px;}
+  .verdictText{font-size:19px;font-weight:750;}
+  .verdictSub{font-size:13px;opacity:.9;margin-top:6px;}
+  .scoreDots{display:flex;gap:5px;justify-content:center;margin-top:10px;}
+  .dot{width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.35);}
+  .dot.on{background:#fff;}
+
+  /* NFR builder */
+  .nfrPick{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .nfrPick select{flex:1;min-width:200px;}
+  .nfrCard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff;position:relative;}
+  .nfrCat{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);margin-bottom:4px;}
+  .nfrExample{font-size:12px;color:#94836a;font-style:italic;margin-bottom:8px;}
+  .rmCorner{position:absolute;top:8px;right:8px;background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;}
+  .emptyNote{font-size:13px;color:#9aa4b0;font-style:italic;text-align:center;padding:20px 4px;}
+  .countPill{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--amber-soft);color:#8a5a16;border-radius:20px;padding:2px 10px;font-weight:700;}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.nfrPick,.rmCorner,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    .rBtn:not([class*=sel-]){display:none;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #5</div>
+      <h1><span class="mono">Understand What Is Doable</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  UNDERSTAND WHAT IS DOABLE — D-V-F-S assessor + NFR builder
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="dvfs", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// DVFS state
+const dvfs={
+  solution:"",
+  lenses:{ desirable:{r:null,note:""}, viable:{r:null,note:""}, feasible:{r:null,note:""}, sustainable:{r:null,note:""} }
+};
+const LENSES=[
+  {id:"desirable", emoji:"😍", enT:"Desirable", frT:"Désirable", enQ:"Do customers and users want this solution?", frQ:"Les clients et usagers veulent-ils cette solution ?"},
+  {id:"viable", emoji:"💰", enT:"Viable", frT:"Viable", enQ:"Does building & offering it create more value than cost?", frQ:"La construire & l'offrir crée-t-il plus de valeur que de coût ?"},
+  {id:"feasible", emoji:"🔧", enT:"Feasible", frT:"Faisable", enQ:"Can we deliver it via build / buy / partner / acquire?", frQ:"Peut-on la livrer via construire / acheter / s'associer / acquérir ?"},
+  {id:"sustainable", emoji:"♻️", enT:"Sustainable", frT:"Durable", enQ:"Can the solution be maintained over time?", frQ:"La solution peut-elle être maintenue dans le temps ?"},
+];
+
+// NFR state
+const nfrList=[];
+const NFR_CATS=[
+  {id:"availability", enT:"Availability", frT:"Disponibilité", enEx:"The system shall be accessible 99.9% of the time.", frEx:"Le système sera accessible 99,9 % du temps."},
+  {id:"compatibility", enT:"Compatibility", frT:"Compatibilité", enEx:"Works across Chrome, Safari, Edge, and Firefox.", frEx:"Fonctionne sur Chrome, Safari, Edge et Firefox."},
+  {id:"maintainability", enT:"Maintainability", frT:"Maintenabilité", enEx:"Diagnostics while in motion reduce repair turnaround.", frEx:"Diagnostics en marche réduisant le délai de réparation."},
+  {id:"performance", enT:"Performance Efficiency", frT:"Efficacité de performance", enEx:"Search results returned in under one second.", frEx:"Résultats de recherche en moins d'une seconde."},
+  {id:"portability", enT:"Portability", frT:"Portabilité", enEx:"The application shall run on specified operating systems.", frEx:"L'application fonctionnera sur les OS spécifiés."},
+  {id:"reliability", enT:"Reliability", frT:"Fiabilité", enEx:"At least 99.9% uptime to minimize disruptions.", frEx:"Disponibilité d'au moins 99,9 % pour minimiser les interruptions."},
+  {id:"scalability", enT:"Scalability", frT:"Scalabilité", enEx:"Supports 10% annual transaction growth at target performance.", frEx:"Supporte 10 % de croissance transactionnelle annuelle."},
+  {id:"security", enT:"Security", frT:"Sécurité", enEx:"Single sign-on for all user access.", frEx:"Authentification unique (SSO) pour tout accès."},
+  {id:"usability", enT:"Usability", frT:"Convivialité", enEx:"Contextual help on all fields to guide the user.", frEx:"Aide contextuelle sur tous les champs."},
+  {id:"certification", enT:"Certification", frT:"Certification", enEx:"ISO 9001 to improve quality management.", frEx:"ISO 9001 pour améliorer la gestion de la qualité."},
+  {id:"compliance", enT:"Compliance", frT:"Conformité", enEx:"The organization shall be SOC 1 and SOC 2 compliant.", frEx:"L'organisation sera conforme SOC 1 et SOC 2."},
+  {id:"localization", enT:"Localization", frT:"Localisation", enEx:"Region-specific graphics and designated languages.", frEx:"Graphiques spécifiques par région et langues désignées."},
+  {id:"sla", enT:"Service Level Agreements", frT:"SLA (niveaux de service)", enEx:"24/7 support; requests acknowledged within one hour.", frEx:"Support 24/7 ; demandes accusées sous une heure."},
+  {id:"extensibility", enT:"Extensibility", frT:"Extensibilité", enEx:"The solution shall use object-oriented frameworks.", frEx:"La solution utilisera des frameworks orientés objet."},
+];
+
+const TABS=[
+  {id:"dvfs", code:"DV", enT:"Feasibility (D-V-F-S)", frT:"Faisabilité (D-V-F-S)"},
+  {id:"nfr", code:"NF", enT:"NFR Builder", frT:"Constructeur NFR"},
+];
+
+const MEMO={
+  dvfs:{
+    en:["Doable means understanding where it operates, who interacts, how it's used, and the current environment.",
+        "Judge through four lenses: Desirable, Viable, Feasible, Sustainable (D-V-F-S).",
+        "Context always changes — re-assess regularly and compile a decision document when needed."],
+    fr:["Faisable = comprendre où ça opère, qui interagit, comment on l'utilise, et l'environnement actuel.",
+        "Juger selon quatre prismes : Désirable, Viable, Faisable, Durable (D-V-F-S).",
+        "Le contexte évolue toujours — réévaluez et compilez un document de décision si besoin."]},
+  nfr:{
+    en:["NFRs are the quality attributes of a solution (BABOK §10.3) — 14 common categories.",
+        "Address them upfront, alongside functional requirements — they're equally (if not more) important.",
+        "A security NFR might rule out certain technologies entirely, so architecture must consider them."],
+    fr:["Les NFR sont les attributs de qualité d'une solution (BABOK §10.3) — 14 catégories courantes.",
+        "Traitez-les en amont, avec les exigences fonctionnelles — aussi (voire plus) importantes.",
+        "Une NFR de sécurité peut éliminer d'emblée certaines technos ; l'architecture doit en tenir compte."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Two tools for the fifth BA principle — judge feasibility, and define the quality attributes.",
+    "Deux outils pour le cinquième principe — juger la faisabilité, et définir les attributs de qualité.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Understand What Is Doable” insight (Principle #5). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Understand What Is Doable » de l'IIBA (principe #5). Aide à la pratique — non testé à l'examen.");
+}
+
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+// ───────── D-V-F-S ─────────
+function renderDvfs(){
+  const p=el("panel");
+  const lensHtml=LENSES.map(L=>{
+    const st=dvfs.lenses[L.id];
+    return `<div class="lens">
+      <div class="lensHead">
+        <span class="lensEmoji">${L.emoji}</span>
+        <div><p class="lensTitle">${lang==="en"?L.enT:L.frT}</p><p class="lensQ">${esc(lang==="en"?L.enQ:L.frQ)}</p></div>
+      </div>
+      <div class="rating">
+        <button class="rBtn ${st.r==="yes"?"sel-yes":""}" data-lens="${L.id}" data-r="yes">${T("Yes","Oui")}</button>
+        <button class="rBtn ${st.r==="partial"?"sel-partial":""}" data-lens="${L.id}" data-r="partial">${T("Partially","Partiellement")}</button>
+        <button class="rBtn ${st.r==="no"?"sel-no":""}" data-lens="${L.id}" data-r="no">${T("No","Non")}</button>
+      </div>
+      <input type="text" data-lensnote="${L.id}" value="${esc(st.note)}" placeholder="${T("Justification / evidence…","Justification / preuve…")}">
+    </div>`;
+  }).join("");
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Feasibility Assessor — D·V·F·S","Évaluateur de faisabilité — D·V·F·S")}</h2>
+      <p class="panelIntro">${T("Rate the solution through four lenses to see whether it's doable, partially doable, or not.","Notez la solution selon quatre prismes pour voir si elle est faisable, partiellement, ou non.")}</p>
+    </div>
+    ${memoUI("dvfs")}
+    <div class="fieldWrap"><span class="fieldLabel">${T("Solution / initiative being assessed","Solution / initiative évaluée")}</span><input type="text" data-dvfs="solution" value="${esc(dvfs.solution)}" placeholder="${T("e.g. Self-service booking portal","ex. Portail de réservation en libre-service")}"></div>
+    ${lensHtml}
+    <div id="verdict"></div>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  el("panel").querySelector("[data-dvfs]").addEventListener("input",e=>{dvfs.solution=e.target.value;});
+  p.querySelectorAll("[data-lens]").forEach(b=>b.onclick=()=>{
+    dvfs.lenses[b.dataset.lens].r=b.dataset.r;renderDvfs();
+  });
+  p.querySelectorAll("[data-lensnote]").forEach(inp=>inp.addEventListener("input",e=>{dvfs.lenses[e.target.dataset.lensnote].note=e.target.value;}));
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{dvfs.solution="";LENSES.forEach(L=>{dvfs.lenses[L.id]={r:null,note:""};});renderDvfs();};
+  renderVerdict();
+}
+function renderVerdict(){
+  const box=el("verdict"); if(!box)return;
+  const vals=LENSES.map(L=>dvfs.lenses[L.id].r);
+  const answered=vals.filter(v=>v!==null).length;
+  if(answered<4){
+    box.innerHTML=`<div class="verdict none"><div class="verdictLabel">${T("Verdict","Verdict")}</div><div class="verdictText">${T("Rate all four lenses","Notez les quatre prismes")}</div><div class="verdictSub">${answered}/4 ${T("assessed","évalués")}</div></div>`;
+    return;
+  }
+  const noCount=vals.filter(v=>v==="no").length;
+  const partialCount=vals.filter(v=>v==="partial").length;
+  const yesCount=vals.filter(v=>v==="yes").length;
+  let cls,txt,sub;
+  if(noCount>0){cls="bad";txt=T("Not doable as-is","Non faisable en l'état");sub=T("At least one lens fails — address it or reconsider scope.","Au moins un prisme échoue — corrigez-le ou revoyez le périmètre.");}
+  else if(partialCount>0){cls="mid";txt=T("Partially doable","Partiellement faisable");sub=T("Deliverable with adjustments — resolve the partial areas.","Livrable avec ajustements — résolvez les zones partielles.");}
+  else{cls="good";txt=T("Doable","Faisable");sub=T("All four lenses pass — proceed with confidence.","Les quatre prismes passent — avancez avec confiance.");}
+  const dots=vals.map(v=>`<span class="dot ${v==="yes"?"on":""}"></span>`).join("");
+  box.innerHTML=`<div class="verdict ${cls}"><div class="verdictLabel">${T("Verdict","Verdict")}${dvfs.solution?" · "+esc(dvfs.solution):""}</div><div class="verdictText">${txt}</div><div class="verdictSub">${sub}</div><div class="scoreDots">${dots}</div></div>`;
+}
+
+// ───────── NFR ─────────
+function renderNfr(){
+  const p=el("panel");
+  const opts=NFR_CATS.map(c=>`<option value="${c.id}">${lang==="en"?c.enT:c.frT}</option>`).join("");
+  const cards=nfrList.length?nfrList.map((n,i)=>{
+    const cat=NFR_CATS.find(c=>c.id===n.cat);
+    return `<div class="nfrCard">
+      <button class="rmCorner" data-nfrrm="${i}">×</button>
+      <div class="nfrCat">${lang==="en"?cat.enT:cat.frT}</div>
+      <div class="nfrExample">${T("Example","Exemple")}: ${esc(lang==="en"?cat.enEx:cat.frEx)}</div>
+      <textarea rows="2" data-nfr="${i}" placeholder="${T("Write your measurable requirement…","Rédigez votre exigence mesurable…")}">${esc(n.text)}</textarea>
+    </div>`;
+  }).join(""):`<div class="emptyNote">${T("No NFRs yet. Pick a category and add one.","Aucune NFR pour l'instant. Choisissez une catégorie et ajoutez-en une.")}</div>`;
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Non-Functional Requirements Builder","Constructeur d'exigences non fonctionnelles")}</h2>
+      <p class="panelIntro">${T("Add the quality attributes your solution must meet. Each example is a template to adapt.","Ajoutez les attributs de qualité que votre solution doit respecter. Chaque exemple est un gabarit à adapter.")}</p>
+    </div>
+    ${memoUI("nfr")}
+    <div class="nfrPick">
+      <select id="nfrCat">${opts}</select>
+      <button class="primary" id="addNfr">+ ${T("Add NFR","Ajouter une NFR")}</button>
+    </div>
+    <div style="margin-bottom:12px"><span class="countPill">${nfrList.length} / 14 ${T("categories used","catégories utilisées")}</span></div>
+    ${cards}
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear all","Tout effacer")}</button>
+    </div>`;
+  bindMemo();
+  el("addNfr").onclick=()=>{nfrList.push({cat:el("nfrCat").value,text:""});renderNfr();};
+  p.querySelectorAll("[data-nfr]").forEach(inp=>inp.addEventListener("input",e=>{nfrList[+e.target.dataset.nfr].text=e.target.value;}));
+  p.querySelectorAll("[data-nfrrm]").forEach(b=>b.onclick=()=>{nfrList.splice(+b.dataset.nfrrm,1);renderNfr();});
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{nfrList.length=0;renderNfr();};
+}
+
+function renderPanel(){ activeTab==="dvfs"?renderDvfs():renderNfr(); }
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

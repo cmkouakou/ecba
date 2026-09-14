@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAISEEN · Value Workbench</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg); color:var(--ink);
+    padding:28px 20px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  /* header */
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:26px;letter-spacing:.08em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:520px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  /* layout */
+  .layout{display:flex;gap:22px;align-items:flex-start;}
+  @media(max-width:720px){.layout{flex-direction:column;} .spine{width:100% !important;}}
+
+  /* spine */
+  .spine{display:flex;gap:12px;flex-shrink:0;width:190px;}
+  .spineTrack{width:3px;background:var(--line);border-radius:3px;position:relative;margin:14px 0;}
+  .spineFill{position:absolute;top:0;left:0;width:3px;background:var(--amber);border-radius:3px;height:0;transition:height .5s cubic-bezier(.4,0,.2,1);}
+  .spineList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;flex:1;}
+  .node{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:9px;padding:8px 9px;cursor:pointer;color:var(--slate);font-size:13px;transition:all .18s ease;font-family:inherit;}
+  .node.active{background:var(--paper);border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .node.done{color:var(--ink);}
+  .nodeCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .nodeWord{flex:1;font-weight:500;}
+  .check{color:var(--amber);font-weight:800;font-size:13px;}
+
+  /* card */
+  .card{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 20px;box-shadow:0 4px 20px rgba(28,37,48,.06);min-width:0;}
+  .cardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .stepCounter{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--slate);letter-spacing:.08em;}
+  .stepKeyBadge{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:15px;width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:var(--ink);color:var(--paper);}
+  .stepTitle{font-size:21px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;line-height:1.2;}
+  .stepIntro{color:var(--slate);font-size:14.5px;margin:0 0 16px;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin-bottom:12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13.5px;color:var(--ink);line-height:1.45;}
+
+  .fields{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;}
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  textarea{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+
+  .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+  .actionsRight{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+  .hint{font-size:12px;color:#94836a;font-style:italic;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .primary:disabled{opacity:.45;cursor:not-allowed;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  .ghost:disabled{opacity:.4;cursor:not-allowed;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  /* result */
+  .result{margin-top:26px;background:var(--ink);border-radius:18px;padding:26px 26px 24px;color:var(--paper);}
+  .eyebrowLight{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-soft);font-weight:600;margin-bottom:8px;}
+  .result h2{font-size:22px;font-weight:780;margin:0 0 16px;letter-spacing:-.01em;color:#fff;}
+  .quote{margin:0 0 22px;padding:16px 20px;border-left:4px solid var(--amber);background:rgba(255,255,255,.05);border-radius:0 12px 12px 0;font-size:18px;line-height:1.4;font-weight:500;color:#fff;}
+  .summaryGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px;}
+  .summaryCard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 14px;}
+  .summaryHead{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+  .summaryKey{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:12px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber);color:#fff;flex-shrink:0;}
+  .summaryTitle{font-size:12.5px;font-weight:600;color:#e8e2d6;line-height:1.3;}
+  .summaryList{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:4px;}
+  .summaryList li{font-size:12.5px;color:#cfd5dc;line-height:1.4;}
+  .summaryEmpty{font-size:12px;color:#7c8794;margin:0;font-style:italic;}
+  .resultActions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .spine,.card,.langBtn,.no-print{display:none !important;}
+    .result{background:#fff;color:#000;border:1px solid #ccc;}
+    .result h2,.quote,.summaryTitle,.summaryList li{color:#000 !important;}
+    .quote{background:#f5f5f5;}
+    .summaryCard{background:#fafafa;border:1px solid #ddd;}
+    .eyebrowLight,.summaryKey{color:var(--amber) !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Identifying Value · Checklist</div>
+      <h1><span class="mono">CAISEEN</span> Value Workbench</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="layout">
+    <nav class="spine" aria-label="Steps">
+      <div class="spineTrack"><div class="spineFill" id="spineFill"></div></div>
+      <ol class="spineList" id="spineList"></ol>
+    </nav>
+
+    <main class="card" id="card"></main>
+  </div>
+
+  <section class="result hidden" id="result"></section>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  CAISEEN — standalone value-identification worksheet
+// ─────────────────────────────────────────────────────────────
+const STEPS = [
+  {key:"C",title:"Classify & differentiate value from benefits",titleFr:"Classifier et distinguer la valeur des bénéfices",
+   intro:"Separate the business result (benefit) from the meaningful consequence for stakeholders (value).",
+   introFr:"Séparez le résultat business (bénéfice) de la conséquence significative pour les parties prenantes (valeur).",
+   memo:["Benefit = business-specific, measurable, short term, for the business AND the customer.",
+         "Value = the side-effect of a benefit, longer term, what stakeholders will pay for, often for a group/society.",
+         "Ex — Benefit: car keeps traction on rough road. Value: a parent picks up their kids faster and safer."],
+   memoFr:["Bénéfice = spécifique au business, mesurable, court terme, pour l'entreprise ET le client.",
+           "Valeur = l'effet secondaire d'un bénéfice, long terme, ce que les parties prenantes sont prêtes à payer, souvent pour un groupe/la société.",
+           "Ex — Bénéfice : la voiture garde son adhérence sur route accidentée. Valeur : un parent va chercher ses enfants plus vite et en sécurité."],
+   fields:[{id:"benefit",label:"The benefit (business result)",labelFr:"Le bénéfice (résultat business)",ph:"e.g. on-time departures, bus frequency, revenue…",phFr:"ex. départs à l'heure, fréquence des bus, revenus…"},
+           {id:"value",label:"The value (stakeholder consequence)",labelFr:"La valeur (conséquence pour la partie prenante)",ph:"e.g. citizens stay connected, social responsibility…",phFr:"ex. citoyens connectés, responsabilité sociale…"},
+           {id:"whofor",label:"Who is this value for?",labelFr:"Pour qui est cette valeur ?",ph:"e.g. riders, community, society…",phFr:"ex. usagers, communauté, société…"}]},
+  {key:"A",title:"Assess current state & context",titleFr:"Évaluer l'état actuel et le contexte",
+   intro:"Understand the landscape before qualifying value. Context makes value realistic.",
+   introFr:"Comprenez le paysage avant de qualifier la valeur. Le contexte rend la valeur réaliste.",
+   memo:["Industry challenges & trends? Organization challenges & trends? Key players?",
+         "Qualify: would the customer pay for it? What dependencies and prerequisites exist?",
+         "Prioritize identified values by societal impact."],
+   memoFr:["Défis et tendances du secteur ? De l'organisation ? Acteurs clés ?",
+           "Qualifiez : le client paierait-il pour cela ? Quelles dépendances et prérequis ?",
+           "Priorisez les valeurs identifiées selon l'impact sociétal."],
+   fields:[{id:"trends",label:"Industry / organization trends & challenges",labelFr:"Tendances et défis secteur / organisation",ph:"e.g. rising fuel cost, remote work, revenue decline…",phFr:"ex. hausse du carburant, télétravail, baisse des revenus…"},
+           {id:"willingpay",label:"Would the customer pay for it? Why?",labelFr:"Le client paierait-il ? Pourquoi ?",ph:"Yes/No + rationale",phFr:"Oui/Non + justification"},
+           {id:"deps",label:"Dependencies & prerequisites",labelFr:"Dépendances et prérequis",ph:"e.g. inflation, political landscape, financial reports…",phFr:"ex. inflation, contexte politique, rapports financiers…"}]},
+  {key:"I",title:"Inform yourself about human factors",titleFr:"S'informer sur les facteurs humains",
+   intro:"People are the constant in value creation. Valued staff and customers make organizations thrive.",
+   introFr:"Les personnes sont la constante de la création de valeur. Un personnel et des clients valorisés font prospérer l'organisation.",
+   memo:["Look beyond the concrete: trust, knowledge-sharing, collaboration, wellbeing.",
+         "Change management, psychological health & safety, wellness, succession planning create value indirectly.",
+         "Managing human factors improves value indicators and the odds of hitting target value streams."],
+   memoFr:["Regardez au-delà du concret : confiance, partage de connaissances, collaboration, bien-être.",
+           "Gestion du changement, santé psychologique, bien-être, planification de la relève créent de la valeur indirectement.",
+           "Gérer les facteurs humains améliore les indicateurs de valeur et les chances d'atteindre les flux de valeur visés."],
+   fields:[{id:"humanvalue",label:"Human/cultural value drivers",labelFr:"Leviers de valeur humains/culturels",ph:"e.g. employee wellbeing, collaboration, trust…",phFr:"ex. bien-être des employés, collaboration, confiance…"},
+           {id:"humanrisk",label:"Human risks to manage",labelFr:"Risques humains à gérer",ph:"e.g. turnover, stress, talent competition…",phFr:"ex. rotation du personnel, stress, concurrence pour les talents…"}]},
+  {key:"S",title:"Strategize & realistically align",titleFr:"Élaborer une stratégie et aligner de façon réaliste",
+   intro:"Check strategic fit and realistic measurability. The true test of value comes with adversity.",
+   introFr:"Vérifiez l'adéquation stratégique et la mesurabilité réaliste. Le vrai test de la valeur vient avec l'adversité.",
+   memo:["Align with vision, mission, core values, and reputation.",
+         "Can it be measured? Who has authority to qualify it? What risks? What baseline?",
+         "Be realistic — value proportionate to investment and expected benefit."],
+   memoFr:["Alignez sur la vision, la mission, les valeurs fondamentales et la réputation.",
+           "Est-ce mesurable ? Qui a l'autorité de la qualifier ? Quels risques ? Quelle référence de base ?",
+           "Soyez réaliste — valeur proportionnée à l'investissement et au bénéfice attendu."],
+   fields:[{id:"align",label:"Alignment with vision / mission / values",labelFr:"Alignement vision / mission / valeurs",ph:"How does it fit strategy & reputation?",phFr:"En quoi cela sert la stratégie et la réputation ?"},
+           {id:"measure",label:"How is it measured? (baseline & authority)",labelFr:"Comment la mesurer ? (référence et autorité)",ph:"e.g. metric, baseline data, who qualifies it…",phFr:"ex. indicateur, données de référence, qui la qualifie…"},
+           {id:"risk",label:"Risks to realizing this value",labelFr:"Risques pour réaliser cette valeur",ph:"e.g. job reclassification, operational change…",phFr:"ex. reclassification de postes, changement opérationnel…"}]},
+  {key:"E",title:"Envision the future",titleFr:"Envisager l'avenir",
+   intro:"Forward-thinking value survives disruption. Anticipate trends and needs before they arrive.",
+   introFr:"Une valeur tournée vers l'avenir survit aux disruptions. Anticipez les tendances et besoins avant qu'ils n'arrivent.",
+   memo:["Showcase what makes you different; anticipate needs before customers ask; stay ahead of competition.",
+         "Scan future drivers: demographics, climate awareness, AI/automation, health consciousness…",
+         "Embed the value in plans built around it, so disruptions are easier to manage."],
+   memoFr:["Montrez ce qui vous distingue ; anticipez les besoins avant que le client ne demande ; gardez une longueur d'avance.",
+           "Scrutez les moteurs futurs : démographie, conscience climatique, IA/automatisation, santé…",
+           "Intégrez la valeur dans des plans construits autour d'elle, pour mieux gérer les disruptions."],
+   fields:[{id:"futuredrivers",label:"Future drivers to plan for",labelFr:"Moteurs futurs à anticiper",ph:"e.g. immigration, climate, AI, real estate prices…",phFr:"ex. immigration, climat, IA, prix de l'immobilier…"},
+           {id:"futurevalue",label:"How the value stays relevant",labelFr:"Comment la valeur reste pertinente",ph:"e.g. convenience, reliability, reduced emissions…",phFr:"ex. commodité, fiabilité, réduction des émissions…"}]},
+  {key:"E",title:"Eliminate or reduce waste",titleFr:"Éliminer ou réduire le gaspillage",
+   intro:"Reducing waste is itself value creation. Use Lean's 7 wastes as a lens.",
+   introFr:"Réduire le gaspillage est en soi de la création de valeur. Utilisez les 7 gaspillages du Lean comme grille.",
+   memo:["Lean 7 wastes: Transport, Inventory, Motion, Waiting, Overproduction, Overprocessing, Defects (TIMWOOD).",
+         "Ensure the improvement is achievable, feasible, realistic — like a benefit.",
+         "Exception: necessary waste (testing, planning) customers won't pay for but is required."],
+   memoFr:["7 gaspillages Lean : Transport, Inventaire, Mouvement, Attente, Surproduction, Surtraitement, Défauts (TIMWOOD).",
+           "Assurez-vous que l'amélioration est atteignable, faisable, réaliste — comme un bénéfice.",
+           "Exception : gaspillage nécessaire (tests, planification) que le client ne paie pas mais qui est requis."],
+   fields:[{id:"waste",label:"Key waste to eliminate/reduce",labelFr:"Gaspillage clé à éliminer/réduire",ph:"e.g. rework, wait times, low-ridership overservice, defects…",phFr:"ex. reprises, temps d'attente, surservice à faible fréquentation, défauts…"},
+           {id:"wastevalue",label:"Value gained from reducing it",labelFr:"Valeur gagnée en le réduisant",ph:"e.g. cost optimization, quality, reliability…",phFr:"ex. optimisation des coûts, qualité, fiabilité…"}]},
+  {key:"N",title:"Nurture continuous improvement",titleFr:"Cultiver l'amélioration continue",
+   intro:"Plan, Do, Check, Act. Pursuing excellence delivers ongoing value to customers and shareholders.",
+   introFr:"Planifier, Faire, Vérifier, Agir. La recherche d'excellence délivre une valeur continue aux clients et actionnaires.",
+   memo:["Think PDCA cycles — small repeated improvements compound.",
+         "Examples: preventative maintenance, demand forecasting, wellness programs, sustainability, scalability.",
+         "Continuous improvement turns a one-time gain into a durable value stream."],
+   memoFr:["Pensez cycles PDCA — de petites améliorations répétées se cumulent.",
+           "Exemples : maintenance préventive, prévision de la demande, programmes de bien-être, durabilité, scalabilité.",
+           "L'amélioration continue transforme un gain ponctuel en flux de valeur durable."],
+   fields:[{id:"improve",label:"Continuous improvement actions",labelFr:"Actions d'amélioration continue",ph:"e.g. preventative maintenance, forecasting, value-added services…",phFr:"ex. maintenance préventive, prévision, services à valeur ajoutée…"},
+           {id:"outcome",label:"Long-term outcome sought",labelFr:"Résultat de long terme visé",ph:"e.g. reduced funding dependency, sustainability, resilience…",phFr:"ex. moindre dépendance au financement, durabilité, résilience…"}]}
+];
+const STEP_WORD=["Classify","Assess","Inform","Strategize","Envision","Eliminate","Nurture"];
+const STEP_WORD_FR=["Classifier","Évaluer","S'informer","Stratégie","Envisager","Éliminer","Cultiver"];
+
+// state
+let lang="fr", current=0, showResult=false, openMemo=true;
+const values={};
+const validated=Array(STEPS.length).fill(false);
+
+const T=(en,fr)=>lang==="en"?en:fr;
+const el=id=>document.getElementById(id);
+const esc=str=>String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const key=(i,id)=>i+":"+id;
+
+function stepFilled(i){
+  const c=STEPS[i].fields.filter(f=>(values[key(i,f.id)]||"").trim()).length;
+  return c>=Math.min(2,STEPS[i].fields.length);
+}
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T("Walk the seven steps, validate each one, and produce a stated value.",
+                          "Parcourez les sept étapes, validez chacune, puis générez une valeur formulée.");
+  el("footer").textContent=T("Study aid based on IIBA's “Identifying Value” checklist & transportation insight. Not exam content — the takeaway is Value ≠ Benefit.",
+                             "Aide à l'étude basée sur la checklist « Identifying Value » de l'IIBA. Non testé à l'examen — la clé est Valeur ≠ Bénéfice.");
+}
+
+function renderSpine(){
+  const progress=validated.filter(Boolean).length;
+  el("spineFill").style.height=(progress/STEPS.length*100)+"%";
+  const list=el("spineList");
+  list.innerHTML="";
+  STEPS.forEach((st,i)=>{
+    const done=validated[i], active=i===current&&!showResult;
+    const li=document.createElement("li");
+    const b=document.createElement("button");
+    b.className="node"+(active?" active":"")+(done?" done":"");
+    b.innerHTML=`<span class="nodeCode">${st.key}</span><span class="nodeWord">${(lang==="en"?STEP_WORD:STEP_WORD_FR)[i]}</span>${done?'<span class="check">✓</span>':''}`;
+    b.onclick=()=>{showResult=false;current=i;openMemo=true;renderAll();};
+    li.appendChild(b);
+    list.appendChild(li);
+  });
+}
+
+function renderCard(){
+  const st=STEPS[current];
+  const memo=lang==="en"?st.memo:st.memoFr;
+  const card=el("card");
+  card.innerHTML=`
+    <div class="cardTop">
+      <span class="stepCounter">${T("Step","Étape")} ${current+1}/${STEPS.length}</span>
+      <span class="stepKeyBadge">${st.key}</span>
+    </div>
+    <h2 class="stepTitle">${esc(T(st.title,st.titleFr))}</h2>
+    <p class="stepIntro">${esc(T(st.intro,st.introFr))}</p>
+    <button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${memo.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></div>`:""}
+    <div class="fields">
+      ${st.fields.map(f=>`
+        <label class="fieldWrap">
+          <span class="fieldLabel">${esc(lang==="en"?f.label:f.labelFr)}</span>
+          <textarea rows="2" data-fid="${f.id}" placeholder="${esc(lang==="en"?f.ph:f.phFr)}">${esc(values[key(current,f.id)]||"")}</textarea>
+        </label>`).join("")}
+    </div>
+    <div class="actions">
+      <button class="ghost" id="backBtn" ${current===0?"disabled":""}>← ${T("Back","Retour")}</button>
+      <div class="actionsRight">
+        ${!stepFilled(current)?`<span class="hint">${T("Fill at least 2 fields to validate","Remplissez au moins 2 champs pour valider")}</span>`:""}
+        <button class="primary" id="validateBtn" ${stepFilled(current)?"":"disabled"}>
+          ${current===STEPS.length-1?T("Validate & generate value","Valider et générer la valeur"):T("Validate step","Valider l'étape")}
+        </button>
+      </div>
+    </div>`;
+
+  el("memoToggle").onclick=()=>{openMemo=!openMemo;renderCard();};
+  card.querySelectorAll("textarea").forEach(ta=>{
+    ta.addEventListener("input",e=>{
+      values[key(current,e.target.dataset.fid)]=e.target.value;
+      // toggle validate button + hint without full re-render (keeps focus)
+      const btn=el("validateBtn");
+      const ok=stepFilled(current);
+      btn.disabled=!ok;
+      const hint=card.querySelector(".hint");
+      if(ok&&hint)hint.remove();
+      if(!ok&&!hint){
+        const span=document.createElement("span");
+        span.className="hint";
+        span.textContent=T("Fill at least 2 fields to validate","Remplissez au moins 2 champs pour valider");
+        btn.parentNode.insertBefore(span,btn);
+      }
+    });
+  });
+  const back=el("backBtn");
+  if(back)back.onclick=()=>{if(current>0){current--;showResult=false;renderAll();}};
+  el("validateBtn").onclick=validateStep;
+}
+
+function validateStep(){
+  validated[current]=true;
+  if(current<STEPS.length-1){current++;openMemo=true;renderAll();}
+  else{showResult=true;renderResult();el("result").scrollIntoView({behavior:"smooth"});}
+}
+
+function renderResult(){
+  const r=el("result");
+  if(!showResult){r.classList.add("hidden");return;}
+  r.classList.remove("hidden");
+  const v=values[key(0,"value")]||"", who=values[key(0,"whofor")]||"";
+  const statement=v
+    ? T(`We create value by delivering "${v}"${who?` for ${who}`:""}.`,
+        `Nous créons de la valeur en délivrant « ${v} »${who?` pour ${who}`:""}.`)
+    : T("Complete Step C to define your core value.","Complétez l'étape C pour définir votre valeur centrale.");
+  r.innerHTML=`
+    <div class="eyebrowLight">${T("Identified value","Valeur identifiée")}</div>
+    <h2>${T("Your value statement","Votre énoncé de valeur")}</h2>
+    <blockquote class="quote">${esc(statement)}</blockquote>
+    <div class="summaryGrid">
+      ${STEPS.map((st,i)=>{
+        const answers=st.fields.map(f=>values[key(i,f.id)]||"").filter(Boolean);
+        return `<div class="summaryCard">
+          <div class="summaryHead"><span class="summaryKey">${st.key}</span><span class="summaryTitle">${esc(T(st.title,st.titleFr))}</span></div>
+          ${answers.length?`<ul class="summaryList">${answers.map(a=>`<li>${esc(a)}</li>`).join("")}</ul>`:`<p class="summaryEmpty">${T("— not filled —","— non rempli —")}</p>`}
+        </div>`;
+      }).join("")}
+    </div>
+    <div class="resultActions no-print">
+      <button class="ghost" id="reviewBtn">${T("Review steps","Revoir les étapes")}</button>
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="primary" id="resetBtn">${T("Start a new analysis","Nouvelle analyse")}</button>
+    </div>`;
+  el("reviewBtn").onclick=()=>{showResult=false;current=0;renderAll();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=reset;
+}
+
+function reset(){
+  Object.keys(values).forEach(k=>delete values[k]);
+  validated.fill(false);
+  current=0;showResult=false;openMemo=true;
+  renderAll();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderAll(){renderStatic();renderSpine();renderCard();renderResult();}
+
+el("langBtn").onclick=()=>{lang=lang==="en"?"en":"fr";lang=el("langBtn").textContent==="FR"?"en":"fr";renderAll();};
+// simpler, robust toggle:
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";renderAll();};
+
+renderAll();
+</script>
+</body>
+</html>

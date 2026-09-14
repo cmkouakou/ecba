@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyze What Is Valuable · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+    --must:#c0392b; --should:#d97a2b; --could:#c9a227; --wont:#7b8794;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:27px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:20px;letter-spacing:.04em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:600px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:14px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+  .formula{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:var(--ink);color:#f0e2cb;border-radius:10px;padding:12px 14px;margin-bottom:16px;line-height:1.6;text-align:center;}
+
+  /* WSJF table */
+  .tableWrap{overflow-x:auto;margin-bottom:14px;}
+  table{border-collapse:collapse;width:100%;min-width:720px;}
+  th,td{padding:9px 8px;text-align:center;font-size:13px;border-bottom:1px solid var(--line);}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--slate);font-weight:700;vertical-align:bottom;}
+  th .thsub{display:block;font-size:9px;color:#9aa4b0;font-weight:500;margin-top:2px;}
+  td.name{text-align:left;font-weight:600;}
+  td input[type=text]{width:100%;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;}
+  td select{border:1px solid var(--line);border-radius:8px;padding:7px 6px;font-size:13px;font-family:inherit;background:#fff;cursor:pointer;}
+  td.cod{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--teal);}
+  td.score{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:15px;color:var(--amber);}
+  .rankBadge{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:12px;width:24px;height:24px;display:inline-grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;}
+  .rankBadge.top{background:var(--amber);color:#fff;}
+  tr.ranked-0 td.name{position:relative;}
+  .rmBtn{background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;}
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+  .winner{background:#fffaf2;border:1px solid var(--amber-soft);border-radius:10px;padding:11px 14px;font-size:13.5px;margin-top:14px;}
+  .winner b{color:var(--amber);}
+
+  /* MoSCoW */
+  .addRow{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .addRow input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;}
+  .moscow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  @media(max-width:820px){.moscow{grid-template-columns:1fr 1fr;}}
+  @media(max-width:520px){.moscow{grid-template-columns:1fr;}}
+  .col{border-radius:12px;border:1px solid var(--line);background:#fff;padding:10px;min-height:120px;}
+  .colHead{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:6px 8px;border-radius:8px;color:#fff;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .col.must .colHead{background:var(--must);}
+  .col.should .colHead{background:var(--should);}
+  .col.could .colHead{background:var(--could);}
+  .col.wont .colHead{background:var(--wont);}
+  .colCount{background:rgba(255,255,255,.25);border-radius:20px;padding:1px 8px;font-size:11px;}
+  .item{background:#faf8f3;border:1px solid var(--line);border-radius:9px;padding:8px 9px;margin-bottom:7px;font-size:13px;}
+  .itemText{display:block;margin-bottom:6px;line-height:1.35;}
+  .itemNav{display:flex;gap:3px;flex-wrap:wrap;}
+  .moveBtn{background:#fff;border:1px solid var(--line);border-radius:6px;font-size:10.5px;padding:2px 6px;cursor:pointer;font-family:'IBM Plex Mono',monospace;color:var(--slate);}
+  .moveBtn:hover{border-color:var(--amber);color:var(--amber);}
+  .itemRm{background:transparent;border:none;color:#c0392b;font-size:13px;cursor:pointer;padding:2px 4px;margin-left:auto;}
+  .colEmpty{font-size:12px;color:#9aa4b0;font-style:italic;text-align:center;padding:12px 4px;}
+  .warnMust{font-size:12.5px;color:var(--must);margin-top:10px;font-style:italic;}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+  input:focus,select:focus{outline:none;border-color:var(--amber) !important;box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.addRow,.repeatBtn,.itemNav,.itemRm,.rmBtn,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    .formula{background:#f5f5f5;color:#000;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #3</div>
+      <h1><span class="mono">Analyze What Is Valuable</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  ANALYZE WHAT IS VALUABLE — WSJF calculator + MoSCoW board
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="wsjf", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const FIB=[1,2,4,5,8,13,20];
+
+// WSJF state
+let wsjf=[
+  {name:"", bv:5, tc:3, rr:2, size:5},
+];
+// MoSCoW state
+let moscow={must:[], should:[], could:[], wont:[]};
+let newItemText="";
+
+const TABS=[
+  {id:"wsjf", code:"WS", enT:"WSJF Calculator", frT:"Calculateur WSJF"},
+  {id:"moscow", code:"MO", enT:"MoSCoW Board", frT:"Tableau MoSCoW"},
+];
+
+const MEMO={
+  wsjf:{
+    en:["Cost of Delay = User/Business Value + Time Criticality + Risk Reduction/Opportunity Enablement.",
+        "Use the modified Fibonacci scale: 1, 2, 4, 5, 8, 13, 20. Higher = more.",
+        "Highest WSJF score = do first. Split large jobs so critical work isn't delayed indefinitely."],
+    fr:["Coût du retard = Valeur utilisateur/métier + Criticité temporelle + Réduction de risque/Ouverture d'opportunité.",
+        "Échelle Fibonacci modifiée : 1, 2, 4, 5, 8, 13, 20. Plus élevé = plus fort.",
+        "Score WSJF le plus élevé = à faire en premier. Découpez les gros travaux pour ne pas retarder le critique."]},
+  moscow:{
+    en:["Must = not viable / unsafe / illegal without it. Should = important but a workaround exists.",
+        "Could = nice-to-have, minimal impact if dropped. Won't = out of scope this time.",
+        "Don't overload Must — keep it to the critical few. Revisit priorities as things change."],
+    fr:["Must = non viable / dangereux / illégal sans cela. Should = important mais un contournement existe.",
+        "Could = agréable, impact minimal si retiré. Won't = hors périmètre cette fois.",
+        "Ne surchargez pas Must — gardez l'essentiel critique. Revisitez les priorités au fil des changements."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Two prioritization tools for the third BA principle — score value quantitatively, or sort it into buckets.",
+    "Deux outils de priorisation pour le troisième principe — chiffrer la valeur, ou la trier en catégories.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Analyze to Determine What Is Valuable” insight (Principle #3). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Analyze to Determine What Is Valuable » de l'IIBA (principe #3). Aide à la pratique — non testé à l'examen.");
+}
+
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+function fibOptions(val){
+  return FIB.map(f=>`<option value="${f}" ${f===val?"selected":""}>${f}</option>`).join("");
+}
+
+// ---- WSJF ----
+function cod(r){return (+r.bv)+(+r.tc)+(+r.rr);}
+function score(r){return cod(r)/(+r.size);}
+
+function renderWsjf(){
+  const p=el("panel");
+  // compute ranking
+  const scored=wsjf.map((r,i)=>({i,s:score(r),name:r.name}));
+  const ordered=[...scored].sort((a,b)=>b.s-a.s);
+  const rankOf={};
+  ordered.forEach((o,pos)=>{rankOf[o.i]=pos;});
+
+  const rows=wsjf.map((r,i)=>{
+    const c=cod(r), sc=score(r), rank=rankOf[i];
+    return `<tr>
+      <td>${r.name.trim()?`<span class="rankBadge ${rank===0?"top":""}">${rank+1}</span>`:`<span class="rankBadge">–</span>`}</td>
+      <td class="name"><input type="text" data-w="${i}" data-k="name" value="${esc(r.name)}" placeholder="${T("Backlog item","Élément de backlog")}"></td>
+      <td><select data-w="${i}" data-k="bv">${fibOptions(r.bv)}</select></td>
+      <td><select data-w="${i}" data-k="tc">${fibOptions(r.tc)}</select></td>
+      <td><select data-w="${i}" data-k="rr">${fibOptions(r.rr)}</select></td>
+      <td class="cod">${c}</td>
+      <td><select data-w="${i}" data-k="size">${fibOptions(r.size)}</select></td>
+      <td class="score">${sc.toFixed(2)}</td>
+      <td>${wsjf.length>1?`<button class="rmBtn" data-rm="${i}">×</button>`:""}</td>
+    </tr>`;
+  }).join("");
+
+  const top=ordered[0];
+  const named=wsjf.filter(r=>r.name.trim()).length;
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("WSJF Calculator","Calculateur WSJF")}</h2>
+      <p class="panelIntro">${T("Score each item, and the table ranks them by priority automatically.","Chiffrez chaque élément, et le tableau les classe par priorité automatiquement.")}</p>
+    </div>
+    ${memoUI("wsjf")}
+    <div class="formula">WSJF = ( ${T("Business Value","Valeur métier")} + ${T("Time Criticality","Criticité temp.")} + ${T("Risk/Opportunity","Risque/Opport.")} ) ÷ ${T("Job Size","Taille")}</div>
+    <div class="tableWrap"><table>
+      <thead><tr>
+        <th>${T("Rank","Rang")}</th>
+        <th style="text-align:left">${T("Item","Élément")}</th>
+        <th>${T("Business","Métier")}<span class="thsub">${T("value","valeur")}</span></th>
+        <th>${T("Time","Temps")}<span class="thsub">${T("criticality","criticité")}</span></th>
+        <th>${T("Risk/Opp","Risq/Opp")}<span class="thsub">${T("reduction","réduction")}</span></th>
+        <th>${T("CoD","CdR")}<span class="thsub">${T("sum","somme")}</span></th>
+        <th>${T("Size","Taille")}<span class="thsub">${T("effort","effort")}</span></th>
+        <th>WSJF<span class="thsub">${T("score","score")}</span></th>
+        <th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <button class="repeatBtn" id="addRow">+ ${T("Add item","Ajouter un élément")}</button>
+    ${named>=2&&top?`<div class="winner">${T("Top priority","Priorité #1")}: <b>${esc(wsjf[top.i].name||T("(unnamed)","(sans nom)"))}</b> — ${T("WSJF score","score WSJF")} ${top.s.toFixed(2)}. ${T("Deliver this first.","À livrer en premier.")}</div>`:""}
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-w]").forEach(inp=>{
+    const evt=inp.tagName==="SELECT"?"change":"input";
+    inp.addEventListener(evt,e=>{
+      const i=+e.target.dataset.w, k=e.target.dataset.k;
+      wsjf[i][k]=(k==="name")?e.target.value:+e.target.value;
+      if(k==="name" && evt==="input"){
+        // light update: recompute ranks + score cells without losing focus is complex; re-render on blur instead
+      }
+      if(k!=="name") renderWsjf();
+    });
+  });
+  // name blur re-render to refresh ranking
+  p.querySelectorAll('input[data-k="name"]').forEach(inp=>inp.addEventListener("blur",renderWsjf));
+  p.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{wsjf.splice(+b.dataset.rm,1);renderWsjf();});
+  el("addRow").onclick=()=>{wsjf.push({name:"",bv:5,tc:3,rr:2,size:5});renderWsjf();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{wsjf=[{name:"",bv:5,tc:3,rr:2,size:5}];renderWsjf();};
+}
+
+// ---- MoSCoW ----
+const COLS=[
+  {id:"must", enT:"Must have", frT:"Must have", enS:"Not viable without it", frS:"Non viable sans cela"},
+  {id:"should", enT:"Should have", frT:"Should have", enS:"Important, workaround exists", frS:"Important, contournement possible"},
+  {id:"could", enT:"Could have", frT:"Could have", enS:"Nice to have", frS:"Agréable à avoir"},
+  {id:"wont", enT:"Won't have", frT:"Won't have", enS:"Out of scope now", frS:"Hors périmètre"},
+];
+
+function renderMoscow(){
+  const p=el("panel");
+  const colHtml=COLS.map((col,ci)=>{
+    const items=moscow[col.id];
+    const itemsHtml=items.length?items.map((txt,ii)=>`
+      <div class="item">
+        <span class="itemText">${esc(txt)}</span>
+        <div class="itemNav">
+          ${ci>0?`<button class="moveBtn" data-move="${col.id}" data-i="${ii}" data-dir="-1">← ${esc(COLS[ci-1][lang==="en"?"enT":"frT"].split(" ")[0])}</button>`:""}
+          ${ci<COLS.length-1?`<button class="moveBtn" data-move="${col.id}" data-i="${ii}" data-dir="1">${esc(COLS[ci+1][lang==="en"?"enT":"frT"].split(" ")[0])} →</button>`:""}
+          <button class="itemRm" data-del="${col.id}" data-i="${ii}">×</button>
+        </div>
+      </div>`).join(""):`<div class="colEmpty">${T("Empty","Vide")}</div>`;
+    return `<div class="col ${col.id}">
+      <div class="colHead">${lang==="en"?col.enT:col.frT}<span class="colCount">${items.length}</span></div>
+      ${itemsHtml}
+    </div>`;
+  }).join("");
+
+  const mustWarn=moscow.must.length>5?`<p class="warnMust">${T("⚠ Many must-haves — make sure each is truly critical.","⚠ Beaucoup de must-have — assurez-vous que chacun est vraiment critique.")}</p>`:"";
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("MoSCoW Board","Tableau MoSCoW")}</h2>
+      <p class="panelIntro">${T("Add requirements, then move each into its bucket. New items land in Should have.","Ajoutez des exigences, puis déplacez chacune dans sa catégorie. Les nouveaux items arrivent dans Should have.")}</p>
+    </div>
+    ${memoUI("moscow")}
+    <div class="addRow">
+      <input type="text" id="newItem" value="${esc(newItemText)}" placeholder="${T("New requirement / feature / story…","Nouvelle exigence / fonctionnalité / story…")}">
+      <button class="primary" id="addItem">+ ${T("Add","Ajouter")}</button>
+    </div>
+    <div class="moscow">${colHtml}</div>
+    ${mustWarn}
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear all","Tout effacer")}</button>
+    </div>`;
+  bindMemo();
+  const ni=el("newItem");
+  ni.addEventListener("input",e=>{newItemText=e.target.value;});
+  ni.addEventListener("keydown",e=>{if(e.key==="Enter")addItem();});
+  el("addItem").onclick=addItem;
+  p.querySelectorAll("[data-move]").forEach(b=>b.onclick=()=>{
+    const from=b.dataset.move, i=+b.dataset.i, dir=+b.dataset.dir;
+    const ci=COLS.findIndex(c=>c.id===from), to=COLS[ci+dir].id;
+    const [item]=moscow[from].splice(i,1);
+    moscow[to].push(item);
+    renderMoscow();
+  });
+  p.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    moscow[b.dataset.del].splice(+b.dataset.i,1);renderMoscow();
+  });
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{moscow={must:[],should:[],could:[],wont:[]};newItemText="";renderMoscow();};
+}
+function addItem(){
+  const v=newItemText.trim();
+  if(!v)return;
+  moscow.should.push(v);
+  newItemText="";
+  renderMoscow();
+}
+
+function renderPanel(){ activeTab==="wsjf"?renderWsjf():renderMoscow(); }
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

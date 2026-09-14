@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>See the Whole · Launcher</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:29px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:23px;letter-spacing:.06em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:560px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .layout{display:flex;gap:22px;align-items:flex-start;}
+  @media(max-width:760px){.layout{flex-direction:column;} .rail{width:100% !important;}}
+
+  /* rail */
+  .rail{flex-shrink:0;width:210px;display:flex;flex-direction:column;gap:18px;}
+  .railGroup{}
+  .railLabel{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9aa4b0;font-weight:700;margin:0 0 8px 2px;}
+  .railList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;}
+  .node{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:9px;padding:8px 9px;cursor:pointer;color:var(--slate);font-size:12.5px;transition:all .18s ease;font-family:inherit;}
+  .node.active{background:var(--paper);border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .node.done{color:var(--ink);}
+  .nodeCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .nodeCode.tech{background:#d7e6e5;color:#1f4f4c;}
+  .nodeWord{flex:1;font-weight:500;}
+  .check{color:var(--amber);font-weight:800;font-size:12px;}
+
+  /* card */
+  .card{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 20px;box-shadow:0 4px 20px rgba(28,37,48,.06);min-width:0;}
+  .cardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .stepCounter{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--slate);letter-spacing:.06em;}
+  .stepKeyBadge{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:13px;min-width:32px;height:32px;padding:0 9px;display:grid;place-items:center;border-radius:8px;background:var(--ink);color:var(--paper);}
+  .stepTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;line-height:1.2;}
+  .stepIntro{color:var(--slate);font-size:14px;margin:0 0 16px;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin-bottom:12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fields{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;}
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;margin-left:2px;}
+  textarea,input[type=text]{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+
+  /* SWOT grid */
+  .swot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;}
+  @media(max-width:520px){.swot{grid-template-columns:1fr;}}
+  .swotCell{border-radius:12px;padding:10px 11px;border:1px solid var(--line);}
+  .swotCell.s{background:#eef6ee;border-color:#cfe4cf;}
+  .swotCell.w{background:#fdf0ee;border-color:#f3d5cf;}
+  .swotCell.o{background:#eef3fb;border-color:#d2e0f2;}
+  .swotCell.t{background:#fbf6ec;border-color:#efe0c4;}
+  .swotHead{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .swotCell textarea{background:rgba(255,255,255,.7);border:none;font-size:13px;}
+  .swotAxis{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#9aa4b0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+
+  /* impact map rows */
+  .imRow{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;}
+  @media(max-width:640px){.imRow{grid-template-columns:1fr;}}
+  .imCol label{font-size:11px;font-weight:600;color:var(--slate);display:block;margin-bottom:3px;}
+  .imFlow{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);text-align:center;margin:2px 0 10px;letter-spacing:.05em;}
+
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+  .rowWrap{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff;position:relative;}
+  .rmBtn{position:absolute;top:8px;right:8px;background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;}
+
+  .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px;}
+  .actionsRight{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;}
+  .hint{font-size:12px;color:#94836a;font-style:italic;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .primary:disabled{opacity:.45;cursor:not-allowed;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  .ghost:disabled{opacity:.4;cursor:not-allowed;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  /* result */
+  .result{margin-top:26px;background:var(--ink);border-radius:18px;padding:26px 26px 24px;color:var(--paper);}
+  .eyebrowLight{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-soft);font-weight:600;margin-bottom:8px;}
+  .result h2{font-size:22px;font-weight:780;margin:0 0 6px;letter-spacing:-.01em;color:#fff;}
+  .result .rsub{color:#aeb8c4;font-size:13.5px;margin:0 0 20px;}
+  .rsection{margin-bottom:20px;}
+  .rsectionHead{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+  .rKey{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:12px;min-width:22px;height:22px;padding:0 6px;display:grid;place-items:center;border-radius:6px;background:var(--amber);color:#fff;}
+  .rKey.tech{background:var(--teal);}
+  .rTitle{font-size:14px;font-weight:700;color:#e8e2d6;}
+  .rCard{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 15px;}
+  .rLine{font-size:13px;color:#cfd5dc;line-height:1.5;margin:3px 0;}
+  .rLine b{color:#fff;font-weight:600;}
+  .rEmpty{font-size:12.5px;color:#7c8794;font-style:italic;}
+  .rSwot{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  @media(max-width:520px){.rSwot{grid-template-columns:1fr;}}
+  .resultActions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:8px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .rail,.card,.langBtn,.no-print{display:none !important;}
+    .result{background:#fff;color:#000;border:1px solid #ccc;}
+    .result h2,.rTitle,.rLine,.rLine b{color:#000 !important;}
+    .rCard{background:#fafafa;border:1px solid #ddd;}
+    .eyebrowLight,.rKey,.rKey.tech{color:#000 !important;}
+    .rsub,.rEmpty{color:#555 !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #1</div>
+      <h1><span class="mono">See the Whole</span> Launcher</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="layout">
+    <nav class="rail" id="rail" aria-label="Sections"></nav>
+    <main class="card" id="card"></main>
+  </div>
+
+  <section class="result hidden" id="result"></section>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  SEE THE WHOLE — Launcher
+//  5 framing questions (5W) + 5 techniques, each with a builder.
+// ─────────────────────────────────────────────────────────────
+
+// ---- FRAMING QUESTIONS (5W) ----
+const FRAMING = [
+  {code:"W?",id:"what",  wEN:"What", wFR:"Quoi",
+   qEN:"What problem are we trying to solve?", qFR:"Quel problème cherchons-nous à résoudre ?",
+   hintEN:"Problem, ROI, value…", hintFR:"Problème, ROI, valeur…"},
+  {code:"Y?",id:"why",   wEN:"Why", wFR:"Pourquoi",
+   qEN:"Why are we doing this? Why do we need to?", qFR:"Pourquoi le faisons-nous ? Pourquoi est-ce nécessaire ?",
+   hintEN:"The reason to act", hintFR:"La raison d'agir"},
+  {code:"WH",id:"who",   wEN:"Who / For whom", wFR:"Qui / Pour qui",
+   qEN:"Who is it for? Who is impacted?", qFR:"À qui s'adresse-t-il ? Qui est impacté ?",
+   hintEN:"Customers, users, vendors, partners, competitors — internal & external", hintFR:"Clients, usagers, fournisseurs, partenaires, concurrents — interne & externe"},
+  {code:"WN",id:"when",  wEN:"When", wFR:"Quand",
+   qEN:"When must it be available and live?", qFR:"Quand doit-il être disponible et en service ?",
+   hintEN:"Releases, market rhythms & events", hintFR:"Releases, rythmes & événements du marché"},
+  {code:"WR",id:"where", wEN:"Where", wFR:"Où",
+   qEN:"Where will it be deployed?", qFR:"Où sera-t-il déployé ?",
+   hintEN:"Physical / geographic location", hintFR:"Localisation physique / géographique"},
+];
+
+// ---- TECHNIQUES ----
+const TECHNIQUES = [
+  {
+    code:"SL", id:"stakeholders",
+    titleEN:"Stakeholder List & Map", titleFR:"Liste & carte des parties prenantes",
+    introEN:"Identify — as early as possible — everyone affected by or influencing the initiative.",
+    introFR:"Identifiez — le plus tôt possible — tous ceux qui sont affectés par ou qui influencent l'initiative.",
+    memoEN:["Cast a wide net: don't overlook vendors, suppliers, partners — anyone who uses, influences, or is impacted.",
+            "Capture: role, circle of influence, tech proficiency, constraints, likes/dislikes, success criteria, comms preferences.",
+            "Kept internal — sharing can be politically sensitive. Org charts are a great starting point."],
+    memoFR:["Ratissez large : n'oubliez ni fournisseurs, ni partenaires — quiconque utilise, influence ou subit la solution.",
+            "Notez : rôle, cercle d'influence, aisance technique, contraintes, préférences, critères de succès, communication.",
+            "Gardé interne — le partage peut être politiquement sensible. Les organigrammes sont un bon départ."],
+    kind:"repeat",
+    itemLabelEN:"Stakeholder", itemLabelFR:"Partie prenante",
+    cols:[
+      {id:"name", lEN:"Name / group", lFR:"Nom / groupe", phEN:"e.g. Enrolment team", phFR:"ex. Équipe d'inscription"},
+      {id:"type", lEN:"Internal / External", lFR:"Interne / Externe", phEN:"Internal", phFR:"Interne"},
+      {id:"interest", lEN:"Interest / influence", lFR:"Intérêt / influence", phEN:"High influence, low interest…", phFR:"Forte influence, faible intérêt…"},
+    ],
+  },
+  {
+    code:"CD", id:"context",
+    titleEN:"Context Diagram", titleFR:"Diagramme de contexte",
+    introEN:"Capture how external entities interact with the solution — scope & boundaries, not internal detail.",
+    introFR:"Saisissez comment les entités externes interagissent avec la solution — portée & frontières, pas le détail interne.",
+    memoEN:["Symbols: external entity, process, flow line.",
+            "\"Peel the onion\": add detail as it emerges, per planning horizon.",
+            "Great way to understand the solution's scope and boundaries."],
+    memoFR:["Symboles : entité externe, processus, ligne de flux.",
+            "« Peler l'oignon » : ajoutez du détail au fil de son émergence, selon l'horizon.",
+            "Excellent moyen de comprendre la portée et les frontières de la solution."],
+    kind:"repeat",
+    itemLabelEN:"Interaction", itemLabelFR:"Interaction",
+    cols:[
+      {id:"entity", lEN:"External entity", lFR:"Entité externe", phEN:"e.g. Advertisers", phFR:"ex. Annonceurs"},
+      {id:"flowin", lEN:"Sends to solution →", lFR:"Envoie à la solution →", phEN:"e.g. Ad slots, payment", phFR:"ex. Espaces pub, paiement"},
+      {id:"flowout", lEN:"← Receives from solution", lFR:"← Reçoit de la solution", phEN:"e.g. Analytics, reach", phFR:"ex. Statistiques, portée"},
+    ],
+  },
+  {
+    code:"SW", id:"swot",
+    titleEN:"SWOT Analysis", titleFR:"Analyse SWOT",
+    introEN:"Scan the current state: internal Strengths & Weaknesses, external Opportunities & Threats.",
+    introFR:"Balayez l'état actuel : Forces & Faiblesses internes, Opportunités & Menaces externes.",
+    memoEN:["Strengths: what sets you apart. Weaknesses: internal limits (inefficient processes, skill gaps).",
+            "Opportunities: emerging markets, tech, partners. Threats: competitors, regulations, market trends.",
+            "High-level by design — deeper horizons need more detailed analysis."],
+    memoFR:["Forces : ce qui vous distingue. Faiblesses : limites internes (processus inefficaces, manques de compétences).",
+            "Opportunités : marchés émergents, tech, partenaires. Menaces : concurrents, régulations, tendances.",
+            "Volontairement de haut niveau — les horizons ultérieurs demandent plus de détail."],
+    kind:"swot",
+  },
+  {
+    code:"MR", id:"market",
+    titleEN:"Market Rhythms & Events", titleFR:"Rythmes & événements du marché",
+    introEN:"Identify recurring cadences (rhythms) and one-time high-impact occurrences (events) that affect value delivery.",
+    introFR:"Identifiez les cadences récurrentes (rythmes) et les occurrences ponctuelles à fort impact (événements) qui affectent la valeur.",
+    memoEN:["Rhythms = recurring, predictable (e.g. Q1 & Q4 enrolment peaks). Events = one-time (e.g. a regulation change).",
+            "Map them to find the best/worst time to release, upgrade, or onboard a vendor.",
+            "Consider regulation timelines, competitor releases, tech changes, holidays driving sales."],
+    memoFR:["Rythmes = récurrents, prévisibles (ex. pics d'inscription Q1 & Q4). Événements = ponctuels (ex. changement de régulation).",
+            "Cartographiez-les pour trouver le meilleur/pire moment pour livrer, mettre à jour, intégrer un fournisseur.",
+            "Pensez aux échéances réglementaires, sorties concurrentes, changements techno, fêtes stimulant les ventes."],
+    kind:"repeat",
+    itemLabelEN:"Rhythm / Event", itemLabelFR:"Rythme / Événement",
+    cols:[
+      {id:"name", lEN:"Name", lFR:"Nom", phEN:"e.g. Annual enrolment period", phFR:"ex. Période d'inscription annuelle"},
+      {id:"kind", lEN:"Rhythm or Event", lFR:"Rythme ou Événement", phEN:"Rhythm (recurring)", phFR:"Rythme (récurrent)"},
+      {id:"timing", lEN:"Timing", lFR:"Moment", phEN:"e.g. Q4", phFR:"ex. T4"},
+      {id:"impact", lEN:"Impact on value", lFR:"Impact sur la valeur", phEN:"High value peak — avoid upgrades", phFR:"Pic de valeur — éviter les mises à jour"},
+    ],
+  },
+  {
+    code:"IM", id:"impact",
+    titleEN:"Impact Mapping", titleFR:"Carte d'impact (Impact Map)",
+    introEN:"Keep everyone focused on the \"why\". Flow: Goal → Actors → Impacts → Deliverables.",
+    introFR:"Gardez le focus sur le « pourquoi ». Flux : Objectif → Acteurs → Impacts → Livrables.",
+    memoEN:["Goal: why are we doing this? (measurable). Actors: who can influence or is affected?",
+            "Impacts: how actors help or obstruct the goal — key activities only, don't list everything.",
+            "Deliverables: unrefined, highest-impact-lowest-cost features. Refined later across horizons."],
+    memoFR:["Objectif : pourquoi le faire ? (mesurable). Acteurs : qui influence ou est affecté ?",
+            "Impacts : comment les acteurs aident ou freinent l'objectif — activités clés seulement.",
+            "Livrables : fonctionnalités brutes, fort impact/faible coût. Affinées plus tard selon les horizons."],
+    kind:"impact",
+  },
+];
+
+const ALL = [...FRAMING.map(f=>({group:"frame",...f})), ...TECHNIQUES.map(t=>({group:"tech",...t}))];
+
+// state
+let lang="fr", current=0, showResult=false, openMemo=true;
+const data={};   // { "id:field" or structured arrays }
+const repeat={}; // { techId: [ {col:val}, ... ] }
+const swot={s:"",w:"",o:"",t:""};
+const impact={goal:"", rows:[]};
+const validatedFrame=false;
+const seen=new Set();
+
+const T=(en,fr)=>lang==="en"?en:fr;
+const el=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ensure repeat arrays exist
+TECHNIQUES.forEach(t=>{ if(t.kind==="repeat" && !repeat[t.id]) repeat[t.id]=[{}]; });
+if(!impact.rows.length) impact.rows=[{}];
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Answer the five framing questions, then work the five techniques. Build a shared, high-level picture of the initiative.",
+    "Répondez aux cinq questions de cadrage, puis travaillez les cinq techniques. Bâtissez une image commune et de haut niveau de l'initiative.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “See the Whole” insight (Business Analysis Principle #1). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « See the Whole » de l'IIBA (principe #1). Aide à la pratique — non testé à l'examen.");
+}
+
+function isFrame(i){return ALL[i].group==="frame";}
+
+function frameFilled(){ return FRAMING.filter(f=>(data["f:"+f.id]||"").trim()).length>=3; }
+
+function renderRail(){
+  const rail=el("rail");
+  rail.innerHTML="";
+  // group 1: framing
+  const g1=document.createElement("div");
+  g1.innerHTML=`<p class="railLabel">${T("Framing · 5W","Cadrage · 5W")}</p>`;
+  const l1=document.createElement("ul"); l1.className="railList";
+  FRAMING.forEach((f,i)=>{
+    const idx=i;
+    const done=(data["f:"+f.id]||"").trim().length>0;
+    const active=idx===current&&!showResult;
+    const b=document.createElement("button");
+    b.className="node"+(active?" active":"")+(done?" done":"");
+    b.innerHTML=`<span class="nodeCode">${f.code}</span><span class="nodeWord">${lang==="en"?f.wEN:f.wFR}</span>${done?'<span class="check">✓</span>':''}`;
+    b.onclick=()=>{showResult=false;current=idx;openMemo=true;renderAll();};
+    const li=document.createElement("li"); li.appendChild(b); l1.appendChild(li);
+  });
+  g1.appendChild(l1); rail.appendChild(g1);
+  // group 2: techniques
+  const g2=document.createElement("div");
+  g2.innerHTML=`<p class="railLabel">${T("Techniques","Techniques")}</p>`;
+  const l2=document.createElement("ul"); l2.className="railList";
+  TECHNIQUES.forEach((t,i)=>{
+    const idx=FRAMING.length+i;
+    const active=idx===current&&!showResult;
+    const done=seen.has(t.id);
+    const b=document.createElement("button");
+    b.className="node"+(active?" active":"")+(done?" done":"");
+    b.innerHTML=`<span class="nodeCode tech">${t.code}</span><span class="nodeWord">${lang==="en"?t.titleEN:t.titleFR}</span>${done?'<span class="check">✓</span>':''}`;
+    b.onclick=()=>{showResult=false;current=idx;openMemo=true;renderAll();};
+    const li=document.createElement("li"); li.appendChild(b); l2.appendChild(li);
+  });
+  g2.appendChild(l2); rail.appendChild(g2);
+}
+
+function memoBlock(memo){
+  return openMemo
+    ? `<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${memo.map(m=>`<li>${esc(m)}</li>`).join("")}</ul></div>`
+    : "";
+}
+function memoToggleBtn(){
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>`;
+}
+function navButtons(){
+  const last=current===ALL.length-1;
+  return `<div class="actions">
+    <button class="ghost" id="backBtn" ${current===0?"disabled":""}>← ${T("Back","Retour")}</button>
+    <div class="actionsRight">
+      <button class="primary" id="nextBtn">${last?T("Finish & generate summary","Terminer & générer la synthèse"):T("Next","Suivant")} →</button>
+    </div></div>`;
+}
+
+function renderCard(){
+  const item=ALL[current];
+  const card=el("card");
+  if(isFrame(item)){
+    card.innerHTML=`
+      <div class="cardTop"><span class="stepCounter">${T("Framing","Cadrage")} · ${current+1}/${ALL.length}</span><span class="stepKeyBadge">${item.code}</span></div>
+      <h2 class="stepTitle">${esc(lang==="en"?item.qEN:item.qFR)}</h2>
+      <p class="stepIntro">${T("Framing question","Question de cadrage")} — <b>${lang==="en"?item.wEN:item.wFR}</b></p>
+      <div class="fields">
+        <label class="fieldWrap">
+          <span class="fieldLabel">${T("Your answer","Votre réponse")} <span class="fieldHint">${esc(lang==="en"?item.hintEN:item.hintFR)}</span></span>
+          <textarea rows="3" id="frameInput" placeholder="${esc(lang==="en"?item.hintEN:item.hintFR)}">${esc(data["f:"+item.id]||"")}</textarea>
+        </label>
+      </div>
+      ${navButtons()}`;
+    el("frameInput").addEventListener("input",e=>{data["f:"+item.id]=e.target.value;renderRail();});
+  } else {
+    // technique
+    const memo=lang==="en"?item.memoEN:item.memoFR;
+    let body="";
+    if(item.kind==="repeat") body=renderRepeat(item);
+    else if(item.kind==="swot") body=renderSwot();
+    else if(item.kind==="impact") body=renderImpact();
+    card.innerHTML=`
+      <div class="cardTop"><span class="stepCounter">${T("Technique","Technique")} · ${current+1}/${ALL.length}</span><span class="stepKeyBadge">${item.code}</span></div>
+      <h2 class="stepTitle">${esc(lang==="en"?item.titleEN:item.titleFR)}</h2>
+      <p class="stepIntro">${esc(lang==="en"?item.introEN:item.introFR)}</p>
+      ${memoToggleBtn()}
+      ${memoBlock(memo)}
+      <div id="builder">${body}</div>
+      ${navButtons()}`;
+    el("memoToggle").onclick=()=>{openMemo=!openMemo;renderCard();};
+    wireBuilder(item);
+    seen.add(item.id);
+  }
+  const back=el("backBtn"); if(back)back.onclick=()=>{if(current>0){current--;showResult=false;renderAll();}};
+  el("nextBtn").onclick=()=>{
+    if(current<ALL.length-1){current++;openMemo=true;showResult=false;renderAll();}
+    else{showResult=true;renderResult();el("result").scrollIntoView({behavior:"smooth"});}
+  };
+}
+
+// ---- repeat builder ----
+function renderRepeat(item){
+  const rows=repeat[item.id];
+  const label=lang==="en"?item.itemLabelEN:item.itemLabelFR;
+  return rows.map((row,ri)=>`
+    <div class="rowWrap">
+      ${rows.length>1?`<button class="rmBtn" data-rm="${ri}" title="Remove">×</button>`:""}
+      <div class="imRow" style="grid-template-columns:repeat(${item.cols.length},1fr)">
+        ${item.cols.map(c=>`
+          <div class="imCol">
+            <label>${esc(lang==="en"?c.lEN:c.lFR)}</label>
+            <input type="text" data-ri="${ri}" data-col="${c.id}" value="${esc(row[c.id]||"")}" placeholder="${esc(lang==="en"?c.phEN:c.phFR)}">
+          </div>`).join("")}
+      </div>
+    </div>`).join("")
+    + `<button class="repeatBtn" id="addRow">+ ${T("Add","Ajouter")} ${esc(label)}</button>`;
+}
+
+// ---- SWOT builder ----
+function renderSwot(){
+  return `
+    <div class="swotAxis">${T("Internal","Interne")}</div>
+    <div class="swot">
+      <div class="swotCell s"><div class="swotHead">💪 ${T("Strengths","Forces")}</div><textarea rows="3" data-swot="s" placeholder="${T("What sets you apart?","Ce qui vous distingue ?")}">${esc(swot.s)}</textarea></div>
+      <div class="swotCell w"><div class="swotHead">⚠️ ${T("Weaknesses","Faiblesses")}</div><textarea rows="3" data-swot="w" placeholder="${T("Internal limits, gaps…","Limites internes, manques…")}">${esc(swot.w)}</textarea></div>
+    </div>
+    <div class="swotAxis" style="margin-top:6px">${T("External","Externe")}</div>
+    <div class="swot">
+      <div class="swotCell o"><div class="swotHead">🚀 ${T("Opportunities","Opportunités")}</div><textarea rows="3" data-swot="o" placeholder="${T("Emerging markets, tech, partners…","Marchés émergents, tech, partenaires…")}">${esc(swot.o)}</textarea></div>
+      <div class="swotCell t"><div class="swotHead">🌩️ ${T("Threats","Menaces")}</div><textarea rows="3" data-swot="t" placeholder="${T("Competitors, regulations, trends…","Concurrents, régulations, tendances…")}">${esc(swot.t)}</textarea></div>
+    </div>`;
+}
+
+// ---- Impact map builder ----
+function renderImpact(){
+  return `
+    <div class="fieldWrap" style="margin-bottom:12px">
+      <span class="fieldLabel">🎯 ${T("Goal","Objectif")} <span class="fieldHint">${T("Why? — measurable","Pourquoi ? — mesurable")}</span></span>
+      <input type="text" id="imGoal" value="${esc(impact.goal)}" placeholder="${T("e.g. Increase new customers by 20%","ex. Augmenter les nouveaux clients de 20%")}">
+    </div>
+    <div class="imFlow">${T("Goal","Objectif")} → ${T("Actor","Acteur")} → ${T("Impact","Impact")} → ${T("Deliverable","Livrable")}</div>
+    ${impact.rows.map((row,ri)=>`
+      <div class="rowWrap">
+        ${impact.rows.length>1?`<button class="rmBtn" data-imrm="${ri}" title="Remove">×</button>`:""}
+        <div class="imRow" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="imCol"><label>${T("Actor / Persona","Acteur / Persona")}</label><input type="text" data-imri="${ri}" data-imcol="actor" value="${esc(row.actor||"")}" placeholder="${T("e.g. Frequent travellers","ex. Voyageurs fréquents")}"></div>
+          <div class="imCol"><label>${T("Impact","Impact")}</label><input type="text" data-imri="${ri}" data-imcol="impact" value="${esc(row.impact||"")}" placeholder="${T("e.g. Use it for airport transfers","ex. L'utiliser pour l'aéroport")}"></div>
+          <div class="imCol"><label>${T("Deliverable","Livrable")}</label><input type="text" data-imri="${ri}" data-imcol="deliverable" value="${esc(row.deliverable||"")}" placeholder="${T("e.g. Integrate with airline sites","ex. Intégrer aux sites aériens")}"></div>
+        </div>
+      </div>`).join("")}
+    <button class="repeatBtn" id="addImRow">+ ${T("Add branch","Ajouter une branche")}</button>`;
+}
+
+function wireBuilder(item){
+  if(item.kind==="repeat"){
+    const b=el("builder");
+    b.querySelectorAll("input[data-col]").forEach(inp=>{
+      inp.addEventListener("input",e=>{
+        const ri=+e.target.dataset.ri, col=e.target.dataset.col;
+        repeat[item.id][ri][col]=e.target.value;
+      });
+    });
+    b.querySelectorAll("[data-rm]").forEach(btn=>{
+      btn.onclick=()=>{repeat[item.id].splice(+btn.dataset.rm,1);renderCard();};
+    });
+    const add=el("addRow"); if(add)add.onclick=()=>{repeat[item.id].push({});renderCard();};
+  } else if(item.kind==="swot"){
+    el("builder").querySelectorAll("[data-swot]").forEach(ta=>{
+      ta.addEventListener("input",e=>{swot[e.target.dataset.swot]=e.target.value;});
+    });
+  } else if(item.kind==="impact"){
+    const g=el("imGoal"); if(g)g.addEventListener("input",e=>{impact.goal=e.target.value;});
+    el("builder").querySelectorAll("input[data-imcol]").forEach(inp=>{
+      inp.addEventListener("input",e=>{
+        const ri=+e.target.dataset.imri, col=e.target.dataset.imcol;
+        impact.rows[ri][col]=e.target.value;
+      });
+    });
+    el("builder").querySelectorAll("[data-imrm]").forEach(btn=>{
+      btn.onclick=()=>{impact.rows.splice(+btn.dataset.imrm,1);renderCard();};
+    });
+    const add=el("addImRow"); if(add)add.onclick=()=>{impact.rows.push({});renderCard();};
+  }
+}
+
+// ---- RESULT ----
+function renderResult(){
+  const r=el("result");
+  if(!showResult){r.classList.add("hidden");return;}
+  r.classList.remove("hidden");
+
+  // framing
+  const frameHtml=FRAMING.map(f=>{
+    const v=(data["f:"+f.id]||"").trim();
+    return `<p class="rLine"><b>${lang==="en"?f.wEN:f.wFR}:</b> ${v?esc(v):`<span class="rEmpty">${T("—","—")}</span>`}</p>`;
+  }).join("");
+
+  // stakeholders / context / market (repeat techs)
+  function repeatHtml(t){
+    const rows=(repeat[t.id]||[]).filter(row=>Object.values(row).some(v=>(v||"").trim()));
+    if(!rows.length) return `<p class="rEmpty">${T("— not filled —","— non rempli —")}</p>`;
+    return rows.map(row=>`<p class="rLine">${t.cols.map(c=>row[c.id]?`<b>${esc(lang==="en"?c.lEN:c.lFR)}:</b> ${esc(row[c.id])}`:"").filter(Boolean).join(" · ")}</p>`).join("");
+  }
+
+  const stake=TECHNIQUES.find(t=>t.id==="stakeholders");
+  const ctx=TECHNIQUES.find(t=>t.id==="context");
+  const mkt=TECHNIQUES.find(t=>t.id==="market");
+
+  const swotHtml=(swot.s||swot.w||swot.o||swot.t)
+    ? `<div class="rSwot">
+        <div class="rCard"><b>💪 ${T("Strengths","Forces")}</b><p class="rLine">${swot.s?esc(swot.s):`<span class="rEmpty">—</span>`}</p></div>
+        <div class="rCard"><b>⚠️ ${T("Weaknesses","Faiblesses")}</b><p class="rLine">${swot.w?esc(swot.w):`<span class="rEmpty">—</span>`}</p></div>
+        <div class="rCard"><b>🚀 ${T("Opportunities","Opportunités")}</b><p class="rLine">${swot.o?esc(swot.o):`<span class="rEmpty">—</span>`}</p></div>
+        <div class="rCard"><b>🌩️ ${T("Threats","Menaces")}</b><p class="rLine">${swot.t?esc(swot.t):`<span class="rEmpty">—</span>`}</p></div>
+      </div>`
+    : `<p class="rEmpty">${T("— not filled —","— non rempli —")}</p>`;
+
+  const imRows=impact.rows.filter(row=>(row.actor||row.impact||row.deliverable));
+  const impactHtml=(impact.goal||imRows.length)
+    ? `<p class="rLine"><b>🎯 ${T("Goal","Objectif")}:</b> ${impact.goal?esc(impact.goal):`<span class="rEmpty">—</span>`}</p>`
+      + imRows.map(row=>`<p class="rLine">${[row.actor,row.impact,row.deliverable].filter(Boolean).map(esc).join(" → ")}</p>`).join("")
+    : `<p class="rEmpty">${T("— not filled —","— non rempli —")}</p>`;
+
+  r.innerHTML=`
+    <div class="eyebrowLight">${T("See the Whole · summary","See the Whole · synthèse")}</div>
+    <h2>${T("High-level picture of the initiative","Image de haut niveau de l'initiative")}</h2>
+    <p class="rsub">${T("Keep this, update it, and expand as you move across the analysis horizons.","Conservez-le, mettez-le à jour et enrichissez-le au fil des horizons d'analyse.")}</p>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey">5W</span><span class="rTitle">${T("Framing questions","Questions de cadrage")}</span></div><div class="rCard">${frameHtml}</div></div>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey tech">SL</span><span class="rTitle">${T("Stakeholders","Parties prenantes")}</span></div><div class="rCard">${repeatHtml(stake)}</div></div>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey tech">CD</span><span class="rTitle">${T("Context — external interactions","Contexte — interactions externes")}</span></div><div class="rCard">${repeatHtml(ctx)}</div></div>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey tech">SW</span><span class="rTitle">SWOT</span></div>${swotHtml}</div>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey tech">MR</span><span class="rTitle">${T("Market rhythms & events","Rythmes & événements")}</span></div><div class="rCard">${repeatHtml(mkt)}</div></div>
+
+    <div class="rsection"><div class="rsectionHead"><span class="rKey tech">IM</span><span class="rTitle">${T("Impact map","Carte d'impact")}</span></div><div class="rCard">${impactHtml}</div></div>
+
+    <div class="resultActions no-print">
+      <button class="ghost" id="reviewBtn">${T("Review sections","Revoir les sections")}</button>
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="primary" id="resetBtn">${T("Start over","Recommencer")}</button>
+    </div>`;
+  el("reviewBtn").onclick=()=>{showResult=false;current=0;renderAll();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=reset;
+}
+
+function reset(){
+  Object.keys(data).forEach(k=>delete data[k]);
+  TECHNIQUES.forEach(t=>{ if(t.kind==="repeat") repeat[t.id]=[{}]; });
+  swot.s=swot.w=swot.o=swot.t="";
+  impact.goal=""; impact.rows=[{}];
+  seen.clear();
+  current=0;showResult=false;openMemo=true;
+  renderAll();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderAll(){renderStatic();renderRail();renderCard();renderResult();}
+
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";renderAll();};
+
+renderAll();
+</script>
+</body>
+</html>

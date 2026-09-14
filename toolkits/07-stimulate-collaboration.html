@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stimulate Collaboration · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:26px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:19px;letter-spacing:.03em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:610px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:14px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;}
+  textarea,input[type=text],select{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus,select:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+  select{cursor:pointer;}
+
+  /* Retro */
+  .frameworkPick{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .frameworkPick select{max-width:280px;}
+  .retroBoard{display:grid;gap:10px;}
+  .retroCol{border-radius:12px;border:1px solid var(--line);background:#fff;padding:10px;}
+  .retroColHead{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:7px 9px;border-radius:8px;color:#fff;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .noteAdd{display:flex;gap:6px;margin-bottom:10px;}
+  .noteAdd input{font-size:13px;padding:7px 9px;}
+  .noteAddBtn{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:0 12px;font-size:16px;cursor:pointer;flex-shrink:0;}
+  .sticky{background:#fffdf3;border:1px solid var(--amber-soft);border-radius:9px;padding:8px 9px;margin-bottom:7px;font-size:13px;line-height:1.35;}
+  .stickyText{display:block;margin-bottom:7px;}
+  .stickyFoot{display:flex;align-items:center;gap:6px;}
+  .voteBtn{background:#fff;border:1px solid var(--line);border-radius:20px;font-size:12px;padding:2px 10px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--teal);display:flex;align-items:center;gap:4px;}
+  .voteBtn:hover{border-color:var(--teal);}
+  .voteCount{background:var(--teal);color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:700;}
+  .stickyRm{background:transparent;border:none;color:#c0392b;font-size:13px;cursor:pointer;margin-left:auto;padding:2px 4px;}
+  .colEmpty{font-size:12px;color:#9aa4b0;font-style:italic;text-align:center;padding:10px 4px;}
+
+  .top3{background:var(--ink);color:#fff;border-radius:14px;padding:16px 18px;margin-top:16px;}
+  .top3Label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-soft);font-weight:700;margin-bottom:10px;}
+  .top3Item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:14px;}
+  .top3Item:last-child{border-bottom:none;}
+  .top3Rank{font-family:'IBM Plex Mono',monospace;font-weight:800;font-size:13px;width:24px;height:24px;display:grid;place-items:center;border-radius:6px;background:var(--amber);color:#fff;flex-shrink:0;}
+  .top3Votes{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#aeb8c4;}
+  .top3Empty{font-size:13px;color:#7c8794;font-style:italic;}
+
+  /* Workshop planner */
+  .wsRow{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.wsRow{grid-template-columns:1fr;}}
+  .blockLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-weight:700;margin:16px 0 8px 2px;display:flex;align-items:center;gap:7px;}
+  .agendaRow,.plRow,.roleRow,.outRow{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  .agendaRow .time{max-width:110px;flex-shrink:0;}
+  .roleRow .who{max-width:200px;flex-shrink:0;}
+  .rmBtn{background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:6px;}
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+  .roleTag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--slate);min-width:96px;font-weight:600;}
+  .totalTime{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--teal);margin-left:auto;font-weight:700;}
+  .outRow input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--amber);cursor:pointer;}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.noteAdd,.frameworkPick,.repeatBtn,.rmBtn,.stickyRm,.voteBtn,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    .top3{background:#f5f5f5;color:#000;}
+    .top3Label,.top3Votes{color:#555 !important;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #6</div>
+      <h1><span class="mono">Stimulate Collaboration</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  STIMULATE COLLABORATION — Retrospective board + Workshop planner
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="retro", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Retro frameworks
+const FRAMEWORKS={
+  ssc:{ enT:"Start · Stop · Continue", frT:"Start · Stop · Continue",
+    cols:[
+      {id:"start", enT:"Start", frT:"Démarrer", color:"#2e7d55"},
+      {id:"stop", enT:"Stop", frT:"Arrêter", color:"#c0392b"},
+      {id:"continue", enT:"Continue", frT:"Continuer", color:"#2f6d6a"},
+    ]},
+  fourls:{ enT:"The 4 Ls", frT:"Les 4 L",
+    cols:[
+      {id:"liked", enT:"Liked", frT:"Aimé", color:"#2e7d55"},
+      {id:"learned", enT:"Learned", frT:"Appris", color:"#2f6d6a"},
+      {id:"lacked", enT:"Lacked", frT:"Manqué", color:"#c9902b"},
+      {id:"longed", enT:"Longed for", frT:"Souhaité", color:"#7a4fb0"},
+    ]},
+  msg:{ enT:"Mad · Sad · Glad", frT:"Mad · Sad · Glad",
+    cols:[
+      {id:"mad", enT:"Mad", frT:"Fâché", color:"#c0392b"},
+      {id:"sad", enT:"Sad", frT:"Triste", color:"#c9902b"},
+      {id:"glad", enT:"Glad", frT:"Content", color:"#2e7d55"},
+    ]},
+};
+let currentFw="ssc";
+// notes: { colId: [ {text, votes}, ... ] }
+let notes={};
+function resetNotes(){ notes={}; FRAMEWORKS[currentFw].cols.forEach(c=>notes[c.id]=[]); }
+resetNotes();
+
+// Workshop planner state
+const ws={
+  goal:"", date:"",
+  agenda:[{time:"",item:""}],
+  parking:[""],
+  roles:{facilitator:"",scribe:"",timekeeper:""},
+  outcomes:[{text:"",done:false}]
+};
+
+const TABS=[
+  {id:"retro", code:"RE", enT:"Retrospective", frT:"Rétrospective"},
+  {id:"workshop", code:"WS", enT:"Workshop Planner", frT:"Planificateur d'atelier"},
+];
+
+const MEMO={
+  retro:{
+    en:["Retrospectives (agile, end of sprint) and Lessons Learned (waterfall, end of project) drive continuous improvement.",
+        "Capture on sticky notes, group by theme, then dot-vote to prioritize.",
+        "Address the top 3 first. A topic that keeps recurring signals a root cause, not just symptoms."],
+    fr:["Rétrospectives (agile, fin de sprint) et Leçons apprises (waterfall, fin de projet) nourrissent l'amélioration continue.",
+        "Notez sur des post-its, regroupez par thème, puis votez par points pour prioriser.",
+        "Traitez le top 3 d'abord. Un sujet récurrent signale une cause racine, pas juste des symptômes."]},
+  workshop:{
+    en:["Set a clear goal and restate it when discussions drift.",
+        "Keep a parking lot for off-topic items; use timeboxes to stay focused.",
+        "Assign roles (facilitator, scribe, timekeeper), document outcomes, confirm agreement."],
+    fr:["Fixez un objectif clair et rappelez-le quand les échanges dérivent.",
+        "Tenez un parking lot pour les hors-sujets ; utilisez des timeboxes pour rester concentré.",
+        "Assignez des rôles (facilitateur, scribe, gardien du temps), documentez et confirmez les résultats."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Two tools for the sixth BA principle — run a retrospective, or plan a focused workshop.",
+    "Deux outils pour le sixième principe — mener une rétrospective, ou planifier un atelier ciblé.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Stimulate Collaboration and Continuous Improvement” insight (Principle #6). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Stimulate Collaboration and Continuous Improvement » de l'IIBA (principe #6). Aide à la pratique — non testé à l'examen.");
+}
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+// ───────── RETRO ─────────
+function renderRetro(){
+  const p=el("panel");
+  const fw=FRAMEWORKS[currentFw];
+  const fwOpts=Object.keys(FRAMEWORKS).map(k=>`<option value="${k}" ${k===currentFw?"selected":""}>${lang==="en"?FRAMEWORKS[k].enT:FRAMEWORKS[k].frT}</option>`).join("");
+  const colCount=fw.cols.length;
+  const colHtml=fw.cols.map(col=>{
+    const arr=notes[col.id]||[];
+    const items=arr.length?arr.map((n,ni)=>`
+      <div class="sticky">
+        <span class="stickyText">${esc(n.text)}</span>
+        <div class="stickyFoot">
+          <button class="voteBtn" data-vote="${col.id}" data-i="${ni}">👍 <span class="voteCount">${n.votes}</span></button>
+          <button class="stickyRm" data-noterm="${col.id}" data-i="${ni}">×</button>
+        </div>
+      </div>`).join(""):`<div class="colEmpty">${T("No notes yet","Aucune note")}</div>`;
+    return `<div class="retroCol">
+      <div class="retroColHead" style="background:${col.color}">${lang==="en"?col.enT:col.frT}<span>${arr.length}</span></div>
+      <div class="noteAdd">
+        <input type="text" data-noteinput="${col.id}" placeholder="${T("Add a note…","Ajouter une note…")}">
+        <button class="noteAddBtn" data-noteadd="${col.id}">+</button>
+      </div>
+      ${items}
+    </div>`;
+  }).join("");
+
+  // top 3 across all notes
+  const all=[];
+  fw.cols.forEach(col=>(notes[col.id]||[]).forEach(n=>{if(n.text.trim())all.push({text:n.text,votes:n.votes,col:lang==="en"?col.enT:col.frT});}));
+  all.sort((a,b)=>b.votes-a.votes);
+  const top=all.filter(n=>n.votes>0).slice(0,3);
+  const top3Html=top.length?top.map((n,i)=>`<div class="top3Item"><span class="top3Rank">${i+1}</span><span>${esc(n.text)} <span style="color:#7c8794;font-size:12px">· ${esc(n.col)}</span></span><span class="top3Votes">${n.votes} ${T("votes","votes")}</span></div>`).join(""):`<div class="top3Empty">${T("Vote on notes to reveal the top 3 to address first.","Votez sur les notes pour révéler le top 3 à traiter en premier.")}</div>`;
+
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Retrospective Board","Tableau de rétrospective")}</h2>
+      <p class="panelIntro">${T("Pick a framework, add sticky notes, dot-vote, and surface the top 3 improvements.","Choisissez un cadre, ajoutez des post-its, votez, et faites ressortir le top 3 des améliorations.")}</p>
+    </div>
+    ${memoUI("retro")}
+    <div class="frameworkPick">
+      <span class="fieldLabel">${T("Framework","Cadre")}:</span>
+      <select id="fwSelect">${fwOpts}</select>
+    </div>
+    <div class="retroBoard" style="grid-template-columns:repeat(${colCount},1fr)">${colHtml}</div>
+    <div class="top3">
+      <div class="top3Label">🏆 ${T("Top 3 to address (by votes)","Top 3 à traiter (par votes)")}</div>
+      ${top3Html}
+    </div>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear board","Vider le tableau")}</button>
+    </div>`;
+  bindMemo();
+  el("fwSelect").onchange=e=>{currentFw=e.target.value;resetNotes();renderRetro();};
+  // add note (button + Enter)
+  p.querySelectorAll("[data-noteadd]").forEach(b=>b.onclick=()=>addNote(b.dataset.noteadd));
+  p.querySelectorAll("[data-noteinput]").forEach(inp=>inp.addEventListener("keydown",e=>{if(e.key==="Enter")addNote(e.target.dataset.noteinput);}));
+  p.querySelectorAll("[data-vote]").forEach(b=>b.onclick=()=>{notes[b.dataset.vote][+b.dataset.i].votes++;renderRetro();});
+  p.querySelectorAll("[data-noterm]").forEach(b=>b.onclick=()=>{notes[b.dataset.noterm].splice(+b.dataset.i,1);renderRetro();});
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{resetNotes();renderRetro();};
+}
+function addNote(colId){
+  const inp=document.querySelector(`[data-noteinput="${colId}"]`);
+  const v=(inp?.value||"").trim();
+  if(!v)return;
+  notes[colId].push({text:v,votes:0});
+  renderRetro();
+}
+
+// ───────── WORKSHOP ─────────
+function parseMin(t){
+  // accept "30", "30m", "1h", "1h30", "90 min"
+  if(!t)return 0;
+  t=t.toLowerCase().replace(/\s/g,"");
+  let h=0,m=0;
+  const hm=t.match(/(\d+)h(\d+)?/);
+  if(hm){h=+hm[1];m=hm[2]?+hm[2]:0;return h*60+m;}
+  const mm=t.match(/(\d+)m?(?:in)?/);
+  if(mm)return +mm[1];
+  return 0;
+}
+function fmtMin(total){
+  const h=Math.floor(total/60),m=total%60;
+  if(h&&m)return `${h}h${m<10?"0":""}${m}`;
+  if(h)return `${h}h`;
+  return `${m} min`;
+}
+function renderWorkshop(){
+  const p=el("panel");
+  const totalMin=ws.agenda.reduce((s,a)=>s+parseMin(a.time),0);
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Workshop Planner","Planificateur d'atelier")}</h2>
+      <p class="panelIntro">${T("Set a clear goal, timebox the agenda, assign roles, and track outcomes to confirm.","Fixez un objectif clair, timeboxez l'agenda, assignez les rôles, et suivez les résultats à confirmer.")}</p>
+    </div>
+    ${memoUI("workshop")}
+    <div class="wsRow">
+      <div class="fieldWrap"><span class="fieldLabel">🎯 ${T("Workshop goal","Objectif de l'atelier")}</span><input type="text" data-ws="goal" value="${esc(ws.goal)}" placeholder="${T("Restate this when talk drifts","À rappeler quand ça dérive")}"></div>
+      <div class="fieldWrap"><span class="fieldLabel">📅 ${T("Date / time","Date / heure")}</span><input type="text" data-ws="date" value="${esc(ws.date)}" placeholder="${T("e.g. Mon 10:00–11:30","ex. Lun 10:00–11:30")}"></div>
+    </div>
+
+    <div class="blockLabel">👥 ${T("Roles","Rôles")}</div>
+    <div class="roleRow"><span class="roleTag">${T("Facilitator","Facilitateur")}</span><input type="text" data-role="facilitator" value="${esc(ws.roles.facilitator)}" placeholder="${T("Name","Nom")}"></div>
+    <div class="roleRow"><span class="roleTag">${T("Scribe / AI","Scribe / IA")}</span><input type="text" data-role="scribe" value="${esc(ws.roles.scribe)}" placeholder="${T("Name or AI notetaker","Nom ou outil IA")}"></div>
+    <div class="roleRow"><span class="roleTag">${T("Timekeeper","Gardien du temps")}</span><input type="text" data-role="timekeeper" value="${esc(ws.roles.timekeeper)}" placeholder="${T("Name","Nom")}"></div>
+
+    <div class="blockLabel">⏱️ ${T("Agenda (timeboxed)","Agenda (timeboxé)")}<span class="totalTime">${T("Total","Total")}: ${fmtMin(totalMin)}</span></div>
+    <div id="agendaList"></div>
+    <button class="repeatBtn" id="addAgenda">+ ${T("Add item","Ajouter un point")}</button>
+
+    <div class="blockLabel" style="margin-top:16px">🅿️ ${T("Parking lot (revisit later)","Parking lot (à revoir plus tard)")}</div>
+    <div id="plList"></div>
+    <button class="repeatBtn" id="addPl">+ ${T("Add item","Ajouter un point")}</button>
+
+    <div class="blockLabel" style="margin-top:16px">✅ ${T("Outcomes to document & confirm","Résultats à documenter & confirmer")}</div>
+    <div id="outList"></div>
+    <button class="repeatBtn" id="addOut">+ ${T("Add outcome","Ajouter un résultat")}</button>
+
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-ws]").forEach(inp=>inp.addEventListener("input",e=>{ws[e.target.dataset.ws]=e.target.value;}));
+  p.querySelectorAll("[data-role]").forEach(inp=>inp.addEventListener("input",e=>{ws.roles[e.target.dataset.role]=e.target.value;}));
+  renderAgenda(); renderPl(); renderOut();
+  el("addAgenda").onclick=()=>{ws.agenda.push({time:"",item:""});renderWorkshop();};
+  el("addPl").onclick=()=>{ws.parking.push("");renderPl();};
+  el("addOut").onclick=()=>{ws.outcomes.push({text:"",done:false});renderOut();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{ws.goal=ws.date="";ws.agenda=[{time:"",item:""}];ws.parking=[""];ws.roles={facilitator:"",scribe:"",timekeeper:""};ws.outcomes=[{text:"",done:false}];renderWorkshop();};
+}
+function renderAgenda(){
+  const c=el("agendaList"); c.innerHTML="";
+  ws.agenda.forEach((a,i)=>{
+    const d=document.createElement("div"); d.className="agendaRow";
+    d.innerHTML=`<input class="time" type="text" data-ag="${i}" data-k="time" value="${esc(a.time)}" placeholder="${T("30m / 1h","30m / 1h")}"><input type="text" data-ag="${i}" data-k="item" value="${esc(a.item)}" placeholder="${T("Agenda item","Point d'agenda")}">${ws.agenda.length>1?`<button class="rmBtn" data-agrm="${i}">×</button>`:""}`;
+    c.appendChild(d);
+  });
+  c.querySelectorAll("[data-ag]").forEach(inp=>inp.addEventListener("input",e=>{
+    ws.agenda[+e.target.dataset.ag][e.target.dataset.k]=e.target.value;
+    if(e.target.dataset.k==="time"){const tt=ws.agenda.reduce((s,a)=>s+parseMin(a.time),0);const el2=document.querySelector(".totalTime");if(el2)el2.textContent=`${T("Total","Total")}: ${fmtMin(tt)}`;}
+  }));
+  c.querySelectorAll("[data-agrm]").forEach(b=>b.onclick=()=>{ws.agenda.splice(+b.dataset.agrm,1);renderWorkshop();});
+}
+function renderPl(){
+  const c=el("plList"); c.innerHTML="";
+  ws.parking.forEach((v,i)=>{
+    const d=document.createElement("div"); d.className="plRow";
+    d.innerHTML=`<input type="text" data-pl="${i}" value="${esc(v)}" placeholder="${T("Off-topic item to revisit","Hors-sujet à revoir")}">${ws.parking.length>1?`<button class="rmBtn" data-plrm="${i}">×</button>`:""}`;
+    c.appendChild(d);
+  });
+  c.querySelectorAll("[data-pl]").forEach(inp=>inp.addEventListener("input",e=>{ws.parking[+e.target.dataset.pl]=e.target.value;}));
+  c.querySelectorAll("[data-plrm]").forEach(b=>b.onclick=()=>{ws.parking.splice(+b.dataset.plrm,1);renderPl();});
+}
+function renderOut(){
+  const c=el("outList"); c.innerHTML="";
+  ws.outcomes.forEach((o,i)=>{
+    const d=document.createElement("div"); d.className="outRow";
+    d.innerHTML=`<input type="checkbox" data-outdone="${i}" ${o.done?"checked":""}><input type="text" data-out="${i}" value="${esc(o.text)}" placeholder="${T("Decision / outcome to confirm","Décision / résultat à confirmer")}">${ws.outcomes.length>1?`<button class="rmBtn" data-outrm="${i}">×</button>`:""}`;
+    c.appendChild(d);
+  });
+  c.querySelectorAll("[data-out]").forEach(inp=>inp.addEventListener("input",e=>{ws.outcomes[+e.target.dataset.out].text=e.target.value;}));
+  c.querySelectorAll("[data-outdone]").forEach(cb=>cb.addEventListener("change",e=>{ws.outcomes[+e.target.dataset.outdone].done=e.target.checked;}));
+  c.querySelectorAll("[data-outrm]").forEach(b=>b.onclick=()=>{ws.outcomes.splice(+b.dataset.outrm,1);renderOut();});
+}
+
+function renderPanel(){ activeTab==="retro"?renderRetro():renderWorkshop(); }
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

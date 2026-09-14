@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Think as a Customer · Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:28px 20px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:8px;}
+  h1{font-size:28px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:1px 10px;border-radius:6px;font-size:22px;letter-spacing:.05em;margin-right:4px;}
+  .sub{color:var(--slate);margin:10px 0 0;font-size:14.5px;max-width:580px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:8px 14px;cursor:pointer;flex-shrink:0;}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+  .tab{display:flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--line);border-radius:11px;padding:10px 15px;cursor:pointer;color:var(--slate);font-size:14px;font-weight:600;font-family:inherit;transition:all .16s ease;}
+  .tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .tabCode{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:11px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;background:var(--amber-soft);color:#8a5a16;flex-shrink:0;}
+  .tab.active .tabCode{background:var(--amber);color:#fff;}
+
+  .panel{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px 22px;box-shadow:0 4px 20px rgba(28,37,48,.06);}
+  .panelHead{margin-bottom:16px;}
+  .panelTitle{font-size:20px;font-weight:750;margin:0 0 6px;letter-spacing:-.01em;}
+  .panelIntro{color:var(--slate);font-size:14px;margin:0;line-height:1.5;}
+
+  .memoToggle{display:inline-flex;align-items:center;gap:8px;background:transparent;border:none;color:var(--amber);font-weight:600;font-size:13px;cursor:pointer;padding:0;margin:14px 0 12px;font-family:inherit;}
+  .memoDot{width:8px;height:8px;border-radius:8px;background:var(--amber);display:inline-block;}
+  .memo{background:#fff;border:1px dashed var(--amber);border-radius:12px;padding:13px 15px;margin-bottom:18px;}
+  .memoLabel{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:8px;}
+  .memoList{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+  .memoList li{font-size:13px;color:var(--ink);line-height:1.45;}
+
+  .fieldWrap{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .fieldLabel{font-size:13px;font-weight:600;color:var(--ink);}
+  .fieldHint{font-size:12px;color:#94836a;font-weight:400;}
+  textarea,input[type=text]{font-family:'Inter',system-ui,sans-serif;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;resize:vertical;outline:none;line-height:1.45;width:100%;}
+  textarea:focus,input[type=text]:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(196,127,42,.12);}
+
+  /* empathy canvas */
+  .empHub{background:var(--ink);color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+  .empHub .fieldLabel{color:#f0e2cb;}
+  .empHub input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;}
+  .empHub input::placeholder{color:#9aa4b0;}
+  .clock{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);text-align:center;margin:0 0 12px;letter-spacing:.05em;}
+  .empGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  @media(max-width:560px){.empGrid{grid-template-columns:1fr;}}
+  .empCell{border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:#fff;}
+  .empNum{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:#fff;background:var(--teal);width:20px;height:20px;display:inline-grid;place-items:center;border-radius:5px;margin-right:7px;}
+  .empHead{font-size:13px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;}
+  .empCell textarea{border:none;background:#fafafa;font-size:13px;}
+  .empThink{border:1px solid var(--amber);background:#fffdf8;}
+  .empThink .empNum{background:var(--amber);}
+
+  /* story generator */
+  .storyPreview{background:var(--ink);color:#fff;border-radius:12px;padding:16px 18px;margin:16px 0;font-size:16px;line-height:1.5;border-left:4px solid var(--amber);}
+  .storyPreview .ph{color:#7c8794;font-style:italic;}
+  .storyPreview b{color:#f0e2cb;font-weight:600;}
+  .acRow{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+  .acRow input{flex:1;}
+  .acGiven{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);min-width:64px;padding-top:11px;text-transform:uppercase;letter-spacing:.05em;}
+  .rmBtn{background:transparent;border:none;color:#c0392b;font-size:16px;cursor:pointer;line-height:1;padding:2px 6px;}
+  .repeatBtn{background:transparent;border:1px dashed var(--line);border-radius:9px;padding:8px 12px;font-size:12.5px;color:var(--slate);cursor:pointer;font-family:inherit;font-weight:600;}
+
+  /* persona */
+  .personaGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.personaGrid{grid-template-columns:1fr;}}
+  .personaCard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px;}
+  .personaTop{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+  .avatar{width:56px;height:56px;border-radius:50%;background:var(--amber-soft);color:#8a5a16;display:grid;place-items:center;font-size:24px;font-weight:800;font-family:'IBM Plex Mono',monospace;flex-shrink:0;}
+  .personaName{font-size:18px;font-weight:750;margin:0;}
+  .personaQuote{font-style:italic;color:var(--slate);font-size:13px;margin:2px 0 0;}
+  .personaRow{display:flex;gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;}
+  .personaRow .k{font-weight:600;min-width:78px;color:var(--teal);}
+
+  .actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px;}
+  .primary{background:var(--amber);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(196,127,42,.3);font-family:inherit;}
+  .ghost{background:transparent;color:var(--slate);border:1px solid var(--line);border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;}
+  button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+  footer{margin-top:22px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.5;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .tabs,.langBtn,.memoToggle,.no-print{display:none !important;}
+    .panel{box-shadow:none;border:1px solid #ccc;}
+    .empHub,.storyPreview{background:#f5f5f5;color:#000;}
+    .empHub .fieldLabel,.storyPreview b{color:#000;}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">IIBA · Business Analysis Principles · #2</div>
+      <h1><span class="mono">Think as a Customer</span> Toolkit</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+  <main class="panel" id="panel"></main>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  THINK AS A CUSTOMER — 3 tools: Empathy Map · User Story · Persona
+// ─────────────────────────────────────────────────────────────
+let lang="fr", activeTab="empathy", openMemo=true;
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---- state ----
+const emp={who:"", need:"", see:"", say:"", do:"", hear:"", think:""};
+const story={role:"", want:"", benefit:"", ac:[{}]};
+const persona={name:"", quote:"", attitude:"", goals:"", needs:"", day:""};
+
+const TABS=[
+  {id:"empathy", code:"EM", enT:"Empathy Map", frT:"Carte d'empathie"},
+  {id:"story",   code:"US", enT:"User Story", frT:"User Story"},
+  {id:"persona", code:"PA", enT:"Persona", frT:"Persona"},
+];
+
+const MEMO={
+  empathy:{
+    en:["Fill the outer four — See · Say · Do · Hear — clockwise FIRST, then Think & Feel last.",
+        "See = environment & market; Say = words you'd expect; Do = observed actions; Hear = what others tell them.",
+        "Think & Feel captures pains, gains, and concerns inside the person's head."],
+    fr:["Remplissez les quatre cases externes — Voir · Dire · Faire · Entendre — dans le sens horaire D'ABORD, puis Penser & Ressentir en dernier.",
+        "Voir = environnement & marché ; Dire = mots attendus ; Faire = actions observées ; Entendre = ce que les autres disent.",
+        "Penser & Ressentir capte les douleurs, gains et préoccupations dans la tête de la personne."]},
+  story:{
+    en:["Format: \"As a [role], I want [goal] so that [benefit].\" Keep it about value, not implementation.",
+        "Focus on the job/role — it keeps the team building what the user actually needs.",
+        "Acceptance criteria (Given / When / Then) make the story testable."],
+    fr:["Format : « En tant que [rôle], je veux [objectif] afin de [bénéfice]. » Restez sur la valeur, pas l'implémentation.",
+        "Centrez sur le métier/rôle — cela garde l'équipe focalisée sur le vrai besoin.",
+        "Les critères d'acceptation (Étant donné / Quand / Alors) rendent la story testable."]},
+  persona:{
+    en:["A persona is fictional but grounded in real people you observed.",
+        "Include: name, personality (a quote), attitude, goals, needs, and a day-in-the-life.",
+        "Great for digital products (apps, portals, shopping) but useful anywhere."],
+    fr:["Un persona est fictif mais ancré dans de vraies personnes observées.",
+        "Inclure : nom, personnalité (une citation), attitude, objectifs, besoins, un jour-dans-la-vie.",
+        "Idéal pour le numérique (apps, portails, e-commerce) mais utile partout."]},
+};
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("sub").textContent=T(
+    "Three practice tools for the second BA principle — empathize, express, and represent your customer.",
+    "Trois outils de pratique pour le deuxième principe — empathiser, exprimer et représenter votre client.");
+  el("footer").textContent=T(
+    "Study tool based on IIBA's “Think as a Customer” insight (Business Analysis Principle #2). Practice aid — not exam content.",
+    "Outil d'étude basé sur l'insight « Think as a Customer » de l'IIBA (principe #2). Aide à la pratique — non testé à l'examen.");
+}
+
+function renderTabs(){
+  const c=el("tabs"); c.innerHTML="";
+  TABS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="tab"+(activeTab===t.id?" active":"");
+    b.innerHTML=`<span class="tabCode">${t.code}</span>${lang==="en"?t.enT:t.frT}`;
+    b.onclick=()=>{activeTab=t.id;openMemo=true;render();};
+    c.appendChild(b);
+  });
+}
+
+function memoUI(key){
+  const m=MEMO[key][lang];
+  return `<button class="memoToggle" id="memoToggle"><span class="memoDot"></span>${openMemo?T("Hide memory aid","Masquer l'aide-mémoire"):T("Show memory aid","Afficher l'aide-mémoire")}</button>
+    ${openMemo?`<div class="memo"><div class="memoLabel">${T("Memory aid","Aide-mémoire")}</div><ul class="memoList">${m.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}`;
+}
+
+function renderPanel(){
+  if(activeTab==="empathy") renderEmpathy();
+  else if(activeTab==="story") renderStory();
+  else renderPersona();
+}
+
+// ---- EMPATHY ----
+function renderEmpathy(){
+  const p=el("panel");
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Empathy Map Canvas","Canevas de carte d'empathie")}</h2>
+      <p class="panelIntro">${T("Focus the team on the person you design for. Work the outer cells clockwise, then the inner one.","Centrez l'équipe sur la personne pour qui vous concevez. Traitez les cases externes dans le sens horaire, puis la case interne.")}</p>
+    </div>
+    ${memoUI("empathy")}
+    <div class="empHub">
+      <div class="fieldWrap" style="margin-bottom:10px">
+        <span class="fieldLabel">${T("Who are we empathizing with?","Avec qui empathisons-nous ?")}</span>
+        <input type="text" data-emp="who" value="${esc(emp.who)}" placeholder="${T("e.g. Claims adjudicator","ex. Régleur de sinistres")}">
+      </div>
+      <div class="fieldWrap" style="margin-bottom:0">
+        <span class="fieldLabel">${T("What do they need to do?","Que doit-elle faire ?")}</span>
+        <input type="text" data-emp="need" value="${esc(emp.need)}" placeholder="${T("e.g. Process a claim accurately","ex. Traiter un sinistre correctement")}">
+      </div>
+    </div>
+    <p class="clock">↻ ${T("Clockwise: See → Say → Do → Hear","Sens horaire : Voir → Dire → Faire → Entendre")}</p>
+    <div class="empGrid">
+      <div class="empCell"><div class="empHead"><span class="empNum">1</span>👀 ${T("See","Voir")}</div><textarea rows="3" data-emp="see" placeholder="${T("Environment, market, what others do","Environnement, marché, ce que font les autres")}">${esc(emp.see)}</textarea></div>
+      <div class="empCell"><div class="empHead"><span class="empNum">2</span>💬 ${T("Say","Dire")}</div><textarea rows="3" data-emp="say" placeholder="${T("What they say or you'd imagine them saying","Ce qu'elle dit ou qu'on l'imagine dire")}">${esc(emp.say)}</textarea></div>
+      <div class="empCell"><div class="empHead"><span class="empNum">3</span>✋ ${T("Do","Faire")}</div><textarea rows="3" data-emp="do" placeholder="${T("Actions & behaviours today","Actions & comportements actuels")}">${esc(emp.do)}</textarea></div>
+      <div class="empCell"><div class="empHead"><span class="empNum">4</span>👂 ${T("Hear","Entendre")}</div><textarea rows="3" data-emp="hear" placeholder="${T("From friends, colleagues, second-hand","D'amis, collègues, ouï-dire")}">${esc(emp.hear)}</textarea></div>
+    </div>
+    <div class="empCell empThink"><div class="empHead"><span class="empNum">5</span>🧠 ${T("Think & Feel","Penser & Ressentir")}</div><textarea rows="3" data-emp="think" placeholder="${T("Pains, gains, concerns inside their head","Douleurs, gains, préoccupations dans sa tête")}">${esc(emp.think)}</textarea></div>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-emp]").forEach(inp=>inp.addEventListener("input",e=>{emp[e.target.dataset.emp]=e.target.value;}));
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{Object.keys(emp).forEach(k=>emp[k]="");render();};
+}
+
+// ---- STORY ----
+function renderStory(){
+  const p=el("panel");
+  const roleTxt=story.role?`<b>${esc(story.role)}</b>`:`<span class="ph">${T("[role]","[rôle]")}</span>`;
+  const wantTxt=story.want?`<b>${esc(story.want)}</b>`:`<span class="ph">${T("[goal]","[objectif]")}</span>`;
+  const benTxt=story.benefit?`<b>${esc(story.benefit)}</b>`:`<span class="ph">${T("[benefit]","[bénéfice]")}</span>`;
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("User / Job / Role Story","User / Job / Role Story")}</h2>
+      <p class="panelIntro">${T("Describe what the customer does to reach a goal — framed as value, not implementation.","Décrivez ce que le client fait pour atteindre un but — en valeur, pas en implémentation.")}</p>
+    </div>
+    ${memoUI("story")}
+    <div class="storyPreview">${T("As a","En tant que")} ${roleTxt}, ${T("I want","je veux")} ${wantTxt} ${T("so that","afin de")} ${benTxt}.</div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Role","Rôle")}</span><input type="text" data-story="role" value="${esc(story.role)}" placeholder="${T("e.g. claims adjudicator","ex. régleur de sinistres")}"></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Goal (I want…)","Objectif (je veux…)")}</span><input type="text" data-story="want" value="${esc(story.want)}" placeholder="${T("e.g. view the member's plan coverage","ex. voir la couverture du membre")}"></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Benefit (so that…)","Bénéfice (afin de…)")}</span><input type="text" data-story="benefit" value="${esc(story.benefit)}" placeholder="${T("e.g. I can process the claim","ex. je peux traiter le sinistre")}"></div>
+    <div class="fieldWrap" style="margin-bottom:8px"><span class="fieldLabel">${T("Acceptance criteria","Critères d'acceptation")} <span class="fieldHint">${T("Given / When / Then","Étant donné / Quand / Alors")}</span></span></div>
+    <div id="acList"></div>
+    <button class="repeatBtn" id="addAc">+ ${T("Add criterion","Ajouter un critère")}</button>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-story]").forEach(inp=>inp.addEventListener("input",e=>{story[e.target.dataset.story]=e.target.value;
+    // live update preview only
+    renderStoryPreview();
+  }));
+  renderAcList();
+  el("addAc").onclick=()=>{story.ac.push({});renderAcList();};
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{story.role=story.want=story.benefit="";story.ac=[{}];render();};
+}
+function renderStoryPreview(){
+  const pv=document.querySelector(".storyPreview");
+  if(!pv)return;
+  const roleTxt=story.role?`<b>${esc(story.role)}</b>`:`<span class="ph">${T("[role]","[rôle]")}</span>`;
+  const wantTxt=story.want?`<b>${esc(story.want)}</b>`:`<span class="ph">${T("[goal]","[objectif]")}</span>`;
+  const benTxt=story.benefit?`<b>${esc(story.benefit)}</b>`:`<span class="ph">${T("[benefit]","[bénéfice]")}</span>`;
+  pv.innerHTML=`${T("As a","En tant que")} ${roleTxt}, ${T("I want","je veux")} ${wantTxt} ${T("so that","afin de")} ${benTxt}.`;
+}
+function renderAcList(){
+  const c=el("acList"); c.innerHTML="";
+  story.ac.forEach((row,ri)=>{
+    const div=document.createElement("div");
+    div.innerHTML=`
+      <div class="acRow"><span class="acGiven">${T("Given","Étant donné")}</span><input type="text" data-ac="${ri}" data-k="given" value="${esc(row.given||"")}" placeholder="${T("initial context","contexte initial")}">${story.ac.length>1?`<button class="rmBtn" data-rm="${ri}">×</button>`:""}</div>
+      <div class="acRow"><span class="acGiven">${T("When","Quand")}</span><input type="text" data-ac="${ri}" data-k="when" value="${esc(row.when||"")}" placeholder="${T("action / event","action / événement")}"></div>
+      <div class="acRow"><span class="acGiven">${T("Then","Alors")}</span><input type="text" data-ac="${ri}" data-k="then" value="${esc(row.then||"")}" placeholder="${T("expected outcome","résultat attendu")}"></div>`;
+    c.appendChild(div);
+  });
+  c.querySelectorAll("[data-ac]").forEach(inp=>inp.addEventListener("input",e=>{
+    story.ac[+e.target.dataset.ac][e.target.dataset.k]=e.target.value;
+  }));
+  c.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{story.ac.splice(+b.dataset.rm,1);renderAcList();});
+}
+
+// ---- PERSONA ----
+function renderPersona(){
+  const p=el("panel");
+  const initial=(persona.name.trim()[0]||"?").toUpperCase();
+  p.innerHTML=`
+    <div class="panelHead">
+      <h2 class="panelTitle">${T("Persona Builder","Constructeur de persona")}</h2>
+      <p class="panelIntro">${T("A fictional character grounded in real people, to see value from the customer's view.","Un personnage fictif ancré dans de vraies personnes, pour voir la valeur du point de vue client.")}</p>
+    </div>
+    ${memoUI("persona")}
+    <div class="personaGrid">
+      <div class="fieldWrap"><span class="fieldLabel">${T("Name","Nom")}</span><input type="text" data-p="name" value="${esc(persona.name)}" placeholder="${T("e.g. Maria the commuter","ex. Maria la navetteuse")}"></div>
+      <div class="fieldWrap"><span class="fieldLabel">${T("Personality — a quote","Personnalité — une citation")}</span><input type="text" data-p="quote" value="${esc(persona.quote)}" placeholder="${T('“I just want it to work.”','« Je veux juste que ça marche. »')}"></div>
+    </div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Attitude","Attitude")}</span><input type="text" data-p="attitude" value="${esc(persona.attitude)}" placeholder="${T("e.g. Impatient, tech-savvy","ex. Impatiente, à l'aise avec la tech")}"></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Goals","Objectifs")}</span><textarea rows="2" data-p="goals" placeholder="${T("What they're trying to achieve","Ce qu'elle cherche à accomplir")}">${esc(persona.goals)}</textarea></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("Needs","Besoins")}</span><textarea rows="2" data-p="needs" placeholder="${T("What they require to succeed","Ce dont elle a besoin pour réussir")}">${esc(persona.needs)}</textarea></div>
+    <div class="fieldWrap"><span class="fieldLabel">${T("A day in the life","Un jour dans la vie")}</span><textarea rows="3" data-p="day" placeholder="${T("Narrative of a typical day","Récit d'une journée typique")}">${esc(persona.day)}</textarea></div>
+
+    <div class="personaCard" id="personaCard">
+      <div class="personaTop">
+        <div class="avatar">${esc(initial)}</div>
+        <div>
+          <p class="personaName">${persona.name?esc(persona.name):T("Persona name","Nom du persona")}</p>
+          ${persona.quote?`<p class="personaQuote">"${esc(persona.quote)}"</p>`:""}
+        </div>
+      </div>
+      ${persona.attitude?`<div class="personaRow"><span class="k">${T("Attitude","Attitude")}</span><span>${esc(persona.attitude)}</span></div>`:""}
+      ${persona.goals?`<div class="personaRow"><span class="k">${T("Goals","Objectifs")}</span><span>${esc(persona.goals)}</span></div>`:""}
+      ${persona.needs?`<div class="personaRow"><span class="k">${T("Needs","Besoins")}</span><span>${esc(persona.needs)}</span></div>`:""}
+      ${persona.day?`<div class="personaRow"><span class="k">${T("Day","Journée")}</span><span>${esc(persona.day)}</span></div>`:""}
+    </div>
+    <div class="actions no-print">
+      <button class="ghost" id="printBtn">${T("Print / Save PDF","Imprimer / Enregistrer PDF")}</button>
+      <button class="ghost" id="resetBtn">${T("Clear","Effacer")}</button>
+    </div>`;
+  bindMemo();
+  p.querySelectorAll("[data-p]").forEach(inp=>inp.addEventListener("input",e=>{persona[e.target.dataset.p]=e.target.value;renderPersonaCard();}));
+  el("printBtn").onclick=()=>window.print();
+  el("resetBtn").onclick=()=>{Object.keys(persona).forEach(k=>persona[k]="");render();};
+}
+function renderPersonaCard(){
+  const card=el("personaCard"); if(!card)return;
+  const initial=(persona.name.trim()[0]||"?").toUpperCase();
+  card.innerHTML=`
+      <div class="personaTop">
+        <div class="avatar">${esc(initial)}</div>
+        <div>
+          <p class="personaName">${persona.name?esc(persona.name):T("Persona name","Nom du persona")}</p>
+          ${persona.quote?`<p class="personaQuote">"${esc(persona.quote)}"</p>`:""}
+        </div>
+      </div>
+      ${persona.attitude?`<div class="personaRow"><span class="k">${T("Attitude","Attitude")}</span><span>${esc(persona.attitude)}</span></div>`:""}
+      ${persona.goals?`<div class="personaRow"><span class="k">${T("Goals","Objectifs")}</span><span>${esc(persona.goals)}</span></div>`:""}
+      ${persona.needs?`<div class="personaRow"><span class="k">${T("Needs","Besoins")}</span><span>${esc(persona.needs)}</span></div>`:""}
+      ${persona.day?`<div class="personaRow"><span class="k">${T("Day","Journée")}</span><span>${esc(persona.day)}</span></div>`:""}`;
+}
+
+function bindMemo(){const b=el("memoToggle"); if(b)b.onclick=()=>{openMemo=!openMemo;render();};}
+
+function render(){renderStatic();renderTabs();renderPanel();}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECBA Toolkits · Claude Marcel Kouakou</title>
+<meta name="description" content="Suite d'outils interactifs pour la préparation à la certification IIBA ECBA — 7 principes d'analyse d'affaires, BACCM™, Knowledge Areas.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2530; --slate:#334155; --paper:#faf8f3; --amber:#c47f2a;
+    --amber-soft:#f0e2cb; --line:#e4ded2; --bg:#eef1f4; --teal:#2f6d6a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:32px 20px 48px;-webkit-font-smoothing:antialiased;line-height:1.5;}
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  /* header */
+  header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:10px;}
+  h1{font-size:34px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.05;}
+  h1 .mono{font-family:'IBM Plex Mono',monospace;background:var(--ink);color:var(--paper);padding:2px 12px;border-radius:7px;font-size:26px;letter-spacing:.04em;margin-right:6px;display:inline-block;}
+  .sub{color:var(--slate);margin:12px 0 0;font-size:15px;max-width:660px;}
+  .langBtn{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;padding:9px 15px;cursor:pointer;flex-shrink:0;}
+
+  /* stats bar */
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;}
+  .stat{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 15px;font-size:13px;color:var(--slate);}
+  .stat b{font-family:'IBM Plex Mono',monospace;font-size:18px;color:var(--ink);display:block;line-height:1.2;font-weight:800;}
+
+  /* intro card */
+  .intro{background:var(--ink);color:#f0e2cb;border-radius:14px;padding:20px 24px;margin-bottom:26px;}
+  .intro h2{font-size:16px;margin:0 0 8px;color:#fff;font-weight:700;letter-spacing:-.01em;}
+  .intro p{margin:0;font-size:14px;line-height:1.55;}
+  .intro .tag{display:inline-block;background:var(--amber);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:2px 8px;border-radius:5px;letter-spacing:.1em;font-weight:700;margin-right:6px;}
+
+  /* section titles */
+  h2.sec{font-size:20px;font-weight:750;margin:0 0 14px;letter-spacing:-.01em;}
+  .secTag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:6px;}
+
+  /* toolkit grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+  @media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px 14px;text-decoration:none;color:inherit;transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;display:flex;flex-direction:column;min-height:180px;position:relative;}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(28,37,48,.1);border-color:var(--amber);}
+  .cardTop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
+  .cardNum{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--amber);font-weight:700;letter-spacing:.12em;}
+  .cardBadge{font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--amber-soft);color:#8a5a16;padding:2px 8px;border-radius:5px;font-weight:700;letter-spacing:.06em;white-space:nowrap;}
+  .cardEmoji{font-size:24px;margin-bottom:6px;}
+  .cardTitle{font-size:15px;font-weight:700;margin:0 0 6px;line-height:1.25;letter-spacing:-.01em;}
+  .cardDesc{font-size:12.5px;color:var(--slate);line-height:1.45;margin:0;flex:1;}
+  .cardFoot{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--teal);margin-top:10px;font-weight:600;}
+  .cardFoot::after{content:" →";}
+
+  /* about section */
+  .about{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin-bottom:22px;}
+  .about p{font-size:14px;color:var(--slate);margin:0 0 10px;line-height:1.55;}
+  .about p:last-child{margin-bottom:0;}
+  .about b{color:var(--ink);}
+
+  /* meta cred */
+  .cred{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line);}
+  .credItem{font-size:12.5px;color:var(--slate);}
+  .credItem b{color:var(--ink);font-weight:600;display:block;font-size:11px;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;color:var(--amber);}
+  .credItem a{color:var(--teal);text-decoration:none;}
+  .credItem a:hover{text-decoration:underline;}
+
+  footer{margin-top:26px;font-size:12px;color:#8a94a0;text-align:center;line-height:1.6;padding:16px;border-top:1px solid var(--line);}
+  footer a{color:var(--slate);}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none !important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1><span class="mono">ECBA</span> <span id="titleMain"></span></h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button class="langBtn" id="langBtn">FR</button>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="intro" id="intro"></div>
+
+  <div class="secTag" id="secTagPrinciples"></div>
+  <h2 class="sec" id="secTitlePrinciples"></h2>
+  <div class="grid" id="gridPrinciples"></div>
+
+  <div class="secTag" id="secTagReference"></div>
+  <h2 class="sec" id="secTitleReference"></h2>
+  <div class="grid" id="gridReference"></div>
+
+  <div class="about" id="about"></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+//  ECBA Toolkits Hub — Claude Marcel Kouakou
+// ─────────────────────────────────────────────────────────────
+let lang="fr";
+const el=id=>document.getElementById(id);
+const T=(en,fr)=>lang==="en"?en:fr;
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const PRINCIPLES=[
+  {n:"01", file:"toolkits/01-caiseen-value.html", emoji:"💎", badge:"BACCM™",
+   enT:"CAISEEN Value Workbench", frT:"CAISEEN Value Workbench",
+   enD:"Walk the 7 CAISEEN steps to identify and formulate the value delivered by an initiative.",
+   frD:"Parcourez les 7 étapes CAISEEN pour identifier et formuler la valeur d'une initiative."},
+  {n:"02", file:"toolkits/02-see-the-whole.html", emoji:"🔭", badge:"Principle 1",
+   enT:"See the Whole Launcher", frT:"See the Whole Launcher",
+   enD:"5W framing + 5 techniques (stakeholders, context, SWOT, market, impact map) to see the whole picture.",
+   frD:"Cadrage 5W + 5 techniques (parties prenantes, contexte, SWOT, marché, impact map) pour voir l'ensemble."},
+  {n:"03", file:"toolkits/03-think-as-a-customer.html", emoji:"👤", badge:"Principle 2",
+   enT:"Think as a Customer", frT:"Think as a Customer",
+   enD:"Three tools: Empathy Map (clockwise), User Story builder, Persona canvas.",
+   frD:"Trois outils : carte d'empathie (sens horaire), constructeur de User Story, canevas Persona."},
+  {n:"04", file:"toolkits/04-analyze-value.html", emoji:"🎯", badge:"Principle 3",
+   enT:"Analyze What Is Valuable", frT:"Analyze What Is Valuable",
+   enD:"WSJF calculator (auto-ranking by score) + MoSCoW board (Must/Should/Could/Won't).",
+   frD:"Calculateur WSJF (tri auto par score) + tableau MoSCoW (Must/Should/Could/Won't)."},
+  {n:"05", file:"toolkits/05-get-real-examples.html", emoji:"🧪", badge:"Principle 4",
+   enT:"Get Real Using Examples", frT:"Get Real Using Examples",
+   enD:"BDD scenario generator (Given/When/Then) + Use Case canvas with alternate flows.",
+   frD:"Générateur de scénario BDD (Given/When/Then) + canevas de cas d'utilisation avec flux alternatifs."},
+  {n:"06", file:"toolkits/06-understand-doable.html", emoji:"⚙️", badge:"Principle 5",
+   enT:"Understand What Is Doable", frT:"Understand What Is Doable",
+   enD:"D-V-F-S feasibility assessor + NFR builder (14 quality attributes per BABOK §10.3).",
+   frD:"Évaluateur de faisabilité D-V-F-S + constructeur NFR (14 attributs de qualité, BABOK §10.3)."},
+  {n:"07", file:"toolkits/07-stimulate-collaboration.html", emoji:"🤝", badge:"Principle 6",
+   enT:"Stimulate Collaboration", frT:"Stimulate Collaboration",
+   enD:"Retrospective board (3 frameworks + dot voting) + Workshop planner (agenda, roles, parking lot).",
+   frD:"Tableau de rétrospective (3 cadres + dot voting) + planificateur d'atelier (agenda, rôles, parking lot)."},
+  {n:"08", file:"toolkits/08-avoid-waste.html", emoji:"🗑️", badge:"Principle 7",
+   enT:"Avoid Waste", frT:"Avoid Waste",
+   enD:"Traceability matrix (auto-detects orphan requirements) + Solution Intent canvas (6 sections).",
+   frD:"Matrice de traçabilité (détection auto des exigences orphelines) + canevas Solution Intent (6 sections)."},
+];
+
+const REFERENCE=[
+  {n:"09", file:"toolkits/09-babok-knowledge-areas.html", emoji:"🗺️", badge:"BABOK®",
+   enT:"6 Knowledge Areas Explorer", frT:"Explorateur des 6 Knowledge Areas",
+   enD:"Interactive map of the 6 BABOK® knowledge areas and their 30 tasks. The BA's compass.",
+   frD:"Carte interactive des 6 domaines de connaissance BABOK® et de leurs 30 tâches. La boussole du BA."},
+];
+
+function renderStatic(){
+  el("langBtn").textContent=lang==="en"?"FR":"EN";
+  el("eyebrow").textContent=T("IIBA · Entry Certificate in Business Analysis · Study Toolkits","IIBA · Entry Certificate in Business Analysis · Outils d'étude");
+  el("titleMain").textContent=T("Toolkits","Toolkits");
+  el("sub").textContent=T(
+    "A suite of interactive tools for preparing the IIBA ECBA certification — built alongside my study of the 7 BA Principles, the BACCM™, and the BABOK® Guide.",
+    "Une suite d'outils interactifs pour préparer la certification IIBA ECBA — construits en parallèle de mon étude des 7 principes BA, du BACCM™ et du guide BABOK®."
+  );
+  el("stats").innerHTML=`
+    <div class="stat"><b>9</b>${T("toolkits","outils")}</div>
+    <div class="stat"><b>7</b>${T("BA principles","principes BA")}</div>
+    <div class="stat"><b>6</b>${T("knowledge areas","domaines de connaissance")}</div>
+    <div class="stat"><b>30</b>${T("BABOK® tasks","tâches BABOK®")}</div>
+    <div class="stat"><b>EN + FR</b>${T("bilingual","bilingue")}</div>`;
+  el("intro").innerHTML=`
+    <h2>${T("How to use these toolkits","Comment utiliser ces outils")}</h2>
+    <p><span class="tag">${T("100% offline","100 % hors ligne")}</span><span class="tag">${T("PDF export","Export PDF")}</span>${T(
+      "Each toolkit is a self-contained HTML page. Open in any browser, work directly in it, and export a PDF when you want to archive your analysis. Use the FR/EN button in the top right of each page.",
+      "Chaque outil est une page HTML autonome. Ouvrez dans n'importe quel navigateur, remplissez, et exportez un PDF pour archiver. Utilisez le bouton FR/EN en haut à droite."
+    )}</p>`;
+  el("secTagPrinciples").textContent=T("PART 1 · The 7 BA Principles","PARTIE 1 · Les 7 principes BA");
+  el("secTitlePrinciples").textContent=T("Practice tools, one per principle","Outils pratiques, un par principe");
+  el("secTagReference").textContent=T("PART 2 · Reference","PARTIE 2 · Référence");
+  el("secTitleReference").textContent=T("Study maps & reference material","Cartes & matériel de référence");
+  el("about").innerHTML=`
+    <div class="secTag">${T("ABOUT","À PROPOS")}</div>
+    <h2 class="sec" style="margin-bottom:12px">${T("About this project","À propos de ce projet")}</h2>
+    <p>${T(
+      "Built by <b>Claude Marcel Kouakou</b> as part of studying for the IIBA <b>ECBA</b> certification (Entry Certificate in Business Analysis). Each toolkit turns a specific principle or technique from the BABOK® Guide into a hands-on, practicable form — because <i>practising a technique cements it better than reading about it</i>.",
+      "Développé par <b>Claude Marcel Kouakou</b> dans le cadre de la préparation à la certification <b>ECBA</b> de l'IIBA (Entry Certificate in Business Analysis). Chaque outil transforme un principe ou une technique du guide BABOK® en une forme pratique — parce que <i>pratiquer une technique l'ancre mieux que la lire</i>."
+    )}</p>
+    <p>${T(
+      "The toolkits also serve as an ongoing portfolio piece — a way of demonstrating BA thinking through building, not just describing.",
+      "Ces outils servent aussi de pièce de portfolio — une manière de démontrer une pensée BA en construisant, pas seulement en décrivant."
+    )}</p>
+    <div class="cred">
+      <div class="credItem"><b>${T("Certifications in progress","Certifications en cours")}</b>ECBA · PSM I · ITIL® 4</div>
+      <div class="credItem"><b>${T("Background","Parcours")}</b>${T("BI Analyst & IT Technician, Université de Montréal","Analyste BI & Technicien IT, Université de Montréal")}</div>
+      <div class="credItem"><b>${T("Publication","Publication")}</b><a href="https://www.amazon.fr/dp/B0DF1RLL2V" target="_blank" rel="noopener">${T("La Stratégie d'Entreprise (Amazon, 2024)","La Stratégie d'Entreprise (Amazon, 2024)")}</a></div>
+    </div>`;
+  el("footer").innerHTML=`${T(
+    "Study aids based on the IIBA BABOK® Guide and the Agile Extension. Not affiliated with IIBA. BABOK® and BACCM™ are trademarks of the International Institute of Business Analysis.",
+    "Aides à l'étude basées sur le guide BABOK® de l'IIBA et l'Agile Extension. Non affilié à l'IIBA. BABOK® et BACCM™ sont des marques de l'International Institute of Business Analysis."
+  )}`;
+}
+
+function renderGrid(id, items){
+  const c=el(id); c.innerHTML="";
+  items.forEach(it=>{
+    const a=document.createElement("a");
+    a.className="card";
+    a.href=it.file;
+    a.innerHTML=`
+      <div class="cardTop">
+        <span class="cardNum">${it.n}</span>
+        <span class="cardBadge">${it.badge}</span>
+      </div>
+      <div class="cardEmoji">${it.emoji}</div>
+      <p class="cardTitle">${esc(lang==="en"?it.enT:it.frT)}</p>
+      <p class="cardDesc">${esc(lang==="en"?it.enD:it.frD)}</p>
+      <span class="cardFoot">${T("Open","Ouvrir")}</span>`;
+    c.appendChild(a);
+  });
+}
+
+function render(){renderStatic();renderGrid("gridPrinciples",PRINCIPLES);renderGrid("gridReference",REFERENCE);}
+el("langBtn").onclick=()=>{lang=(lang==="en")?"fr":"en";render();};
+render();
+</script>
+</body>
+</html>
